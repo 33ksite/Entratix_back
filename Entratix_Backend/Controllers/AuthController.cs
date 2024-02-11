@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using Google.Apis.Auth;
 
 namespace Entratix_Backend.Controllers
 {
@@ -37,8 +38,16 @@ namespace Entratix_Backend.Controllers
                 return BadRequest("Username Or Password Was Invalid");
             }
           
+            
+
+            return Ok(JWTGeneratior(user));
+        }
+
+        public dynamic JWTGeneratior(User user) {
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(this._applicationSettings.Secret);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -48,15 +57,44 @@ namespace Entratix_Backend.Controllers
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             };
-            
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var encripterToken = tokenHandler.WriteToken(token);
 
-            return Ok(new { token = encripterToken, username = user.UserName });
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var encrypterToken = tokenHandler.WriteToken(token);
+
+            HttpContext.Response.Cookies.Append("token", encrypterToken, new CookieOptions
+            {
+                Expires = DateTime.Now.AddDays(7),
+                HttpOnly = true,
+                Secure = true,
+                IsEssential = true,
+                SameSite = SameSiteMode.None
+            });
+
+            return new { token = "", username = user.UserName };
         }
 
+        [HttpPost("LoginWithGoogle")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] string credential)
+        { 
+            var settings = new GoogleJsonWebSignature.ValidationSettings() { 
+                Audience = new List<string> { this._applicationSettings.GoogleClientId } 
+            };
 
-        private bool CheckPassword(string password, User user)
+            var payload = await GoogleJsonWebSignature.ValidateAsync(credential, settings);
+
+            var user = UserList.Where(x=>x.UserName == payload.Email).FirstOrDefault();
+
+            if (user != null)
+            {
+                return Ok(JWTGeneratior(user));
+            }
+            else {
+                return BadRequest();
+            }
+            
+        }
+
+            private bool CheckPassword(string password, User user)
         {
             bool result;
 

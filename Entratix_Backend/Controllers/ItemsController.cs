@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Entratix_Backend.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     public class ItemsController : Controller
     {

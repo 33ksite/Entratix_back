@@ -14,20 +14,25 @@ namespace DataAccess
 
         public List<string> GetUsers()
         {
+
+
+
             var entityNames = new List<string>();
 
             // Obtener todas las entidades en el contexto
             var entityTypes = _dbContexto.Model.GetEntityTypes();
 
-            // Iterar sobre las entidades y obtener sus nombres
-            foreach (var entityType in entityTypes)
+            //Guardar en una variable todas las tablas de la bdd
+        foreach (var entityType in entityTypes)
             {
-                entityNames.Add(entityType.Name);
+                _dbContexto.Model.FindEntityType(entityType.Name);
             }
 
+            var test = _dbContexto.Users.FirstOrDefault();
+            var test2 = _dbContexto.Roles.FirstOrDefault(r => r.Id == 1);
 
             //Obtener lista de nombres de usuarios
-            return _dbContexto.Users.Select(u => u.FirstName).ToList();
+            return _dbContexto.Users.Select(x => x.FirstName).ToList();
         }
     }
 }

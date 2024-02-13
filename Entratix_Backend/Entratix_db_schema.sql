@@ -1,6 +1,3 @@
--- Create the database EntratixDB
-CREATE DATABASE EntratixDB;
-
 -- Create the table Roles
 CREATE TABLE Roles (
     id INT PRIMARY KEY,

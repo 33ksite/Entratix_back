@@ -4,7 +4,7 @@
 export PGPASSWORD=admin
 
 # Ejecutar el comando psql
-psql -U admin -d entratix_db -h localhost -p 5434 -f db.sql
+psql -U admin -d entratix_db -h localhost -p 5432 -f Entratix_db_schema.sql
 
 # Limpiar la variable de entorno PGPASSWORD
 unset PGPASSWORD

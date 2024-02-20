@@ -32,13 +32,13 @@ namespace Entratix_Backend.Controllers
             }
 
             var match = CheckPassword(model.Password, user);
-            
+
             if (!match)
             {
                 return BadRequest("Username Or Password Was Invalid");
             }
-          
-            
+
+
 
             return Ok(JWTGeneratior(user));
         }
@@ -61,17 +61,80 @@ namespace Entratix_Backend.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var encrypterToken = tokenHandler.WriteToken(token);
 
-            HttpContext.Response.Cookies.Append("token", encrypterToken, new CookieOptions
+            SetJWT(encrypterToken);
+
+            var refreshToken = GenerateRefreshToken();
+
+            SetRefreshToken(refreshToken, user);
+
+
+            return new {  };
+        }
+
+        private RefreshToken GenerateRefreshToken() {
+
+            var refreshToken = new RefreshToken
             {
-                Expires = DateTime.Now.AddDays(7),
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expires = DateTime.UtcNow.AddDays(7),
+                Created = DateTime.UtcNow
+            };
+            return refreshToken;
+        }
+
+        [HttpGet("RefreshToken")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["X-Refresh-Token"];
+
+            var user = UserList.Where(x => x.Token == refreshToken).FirstOrDefault();
+
+            if (user == null || user.TokenExpires < DateTime.Now)
+            {
+                return Unauthorized("Token has expired");
+            }
+
+            JWTGeneratior(user);
+
+            return Ok();
+        }
+
+        public void SetRefreshToken(RefreshToken refreshToken, User user)
+        {
+
+            HttpContext.Response.Cookies.Append("X-Refresh-Token", refreshToken.Token, new CookieOptions
+            {
+                Expires = refreshToken.Expires,
                 HttpOnly = true,
                 Secure = true,
                 IsEssential = true,
                 SameSite = SameSiteMode.None
             });
 
-            return new { token = "", username = user.UserName };
+            UserList.Where(x => x.UserName == user.UserName).First().Token = refreshToken.Token;
+            UserList.Where(x => x.UserName == user.UserName).First().TokenCreated = refreshToken.Created;
+            UserList.Where(x => x.UserName == user.UserName).First().TokenExpires = refreshToken.Expires;
         }
+
+        public void SetJWT(string encrypterToken) {
+            HttpContext.Response.Cookies.Append("X-Access-Token", encrypterToken, new CookieOptions
+            {
+                Expires = DateTime.Now.AddMinutes(15),
+                HttpOnly = true,
+                Secure = true,
+                IsEssential = true,
+                SameSite = SameSiteMode.None
+            });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> RevokeToken(string username)
+        {
+            UserList.Where(x => x.UserName == username).Select(x => x.Token = String.Empty);
+        
+            return Ok();
+        }
+      
 
         [HttpPost("LoginWithGoogle")]
         public async Task<IActionResult> LoginWithGoogle([FromBody] string credential)

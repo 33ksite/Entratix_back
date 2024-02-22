@@ -1,14 +1,27 @@
+
+
+
+// Add services to the container.
+using DataAccess;
+using IDataAccess;
+using DataAccess.Contexts;
+using IBusinessLogic;
+using BusinessLogic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Entratix_Backend;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
-// Add services to the container.
+
+// Load appsettings.json configuration
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -42,6 +55,25 @@ builder.Services.AddAuthentication(x =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder => builder.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials());
+var connectionString = configuration.GetConnectionString("PostgreSQL");
+Console.WriteLine($"Cadena de conexi�n a la base de datos: {connectionString}");
+builder.Services.AddDbContext<DbContexto>(options =>
+    options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserLogic, UserLogic>();
+
+
+// Configure CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
 });
 
 var app = builder.Build();
@@ -56,6 +88,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

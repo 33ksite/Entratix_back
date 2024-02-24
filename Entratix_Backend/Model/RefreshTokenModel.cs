@@ -1,6 +1,6 @@
 ﻿namespace Entratix_Backend.Model
 {
-    public class RefreshToken
+    public class RefreshTokenModel
     {
         public string Token { get; set; }
         public DateTime Created { get; set; }

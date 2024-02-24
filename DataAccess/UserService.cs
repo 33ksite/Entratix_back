@@ -1,5 +1,7 @@
 ﻿using DataAccess.Contexts;
+using Domain;
 using IDataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess
 {
@@ -12,27 +14,84 @@ namespace DataAccess
             _dbContexto = dbContexto;
         }
 
-        public List<string> GetUsers()
+        public List<string> GetAll()
         {
-
-
-
-            var entityNames = new List<string>();
-
-            // Obtener todas las entidades en el contexto
-            var entityTypes = _dbContexto.Model.GetEntityTypes();
-
-            //Guardar en una variable todas las tablas de la bdd
-        foreach (var entityType in entityTypes)
-            {
-                _dbContexto.Model.FindEntityType(entityType.Name);
-            }
-
-            var test = _dbContexto.Users.FirstOrDefault();
-            var test2 = _dbContexto.Roles.FirstOrDefault(r => r.Id == 1);
-
-            //Obtener lista de nombres de usuarios
-            return _dbContexto.Users.Select(x => x.FirstName).ToList();
+            
+          
+            return new List<string> { "user1", "user2", "user3" };
         }
+
+        public async Task<string> Insert(User user)
+        {
+            try
+            {
+
+                await _dbContexto.Users.AddAsync(user);
+                await _dbContexto.SaveChangesAsync();
+
+                return "Usuario insertado correctamente";
+            }
+            catch (Exception ex)
+            {
+                return ($"Error al insertar el usuario: {ex.Message}");
+            }
+        }
+
+        public async Task<User> Get(string userEmail)
+        {
+            try
+            {
+
+                User user = await _dbContexto.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Error al obtener el usuario: {ex}");
+                return null;
+            }
+        }
+
+
+
+        public async Task<string> Update(User user)
+        {
+            try
+            {
+                var existingUser = await _dbContexto.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+
+                if (existingUser != null)
+                {
+                    
+                    existingUser.FirstName = user.FirstName;
+                    existingUser.LastName = user.LastName;
+                    existingUser.Phone = user.Phone;
+                    existingUser.PasswordHash = user.PasswordHash;
+                    existingUser.PasswordSalt = user.PasswordSalt;
+                    existingUser.Token = user.Token;
+                    existingUser.TokenCreated = user.TokenCreated;
+                    existingUser.TokenExpires = user.TokenExpires;
+                    
+
+
+
+                    await _dbContexto.SaveChangesAsync();
+                    return "Usuario actualizado correctamente";
+                }
+                else
+                {
+                    return "Usuario no encontrado";
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Error al actualizar el usuario: {ex.Message}";
+            }
+        }
+
+
+
     }
 }

@@ -8,42 +8,67 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using Google.Apis.Auth;
+using IDataAccess;
+using IBusinessLogic;
+using Google.Apis.Util;
+using DataAccess;
 
 namespace Entratix_Backend.Controllers
 {
     public class AuthController : Controller
     {
-        private static List<User> UserList = new List<User>();
+        private static List<UserModel> UserList = new List<UserModel>();
         private readonly AppSettings _applicationSettings;
 
-        public AuthController(IOptions<AppSettings> appSettings)
+        private readonly IAuthLogic _authLogic;
+
+        public AuthController(IAuthLogic authLogic, IOptions<AppSettings> appSettings)
         {
-            _applicationSettings = appSettings.Value;
+            _authLogic = authLogic; _applicationSettings = appSettings.Value;
         }
 
         [HttpPost("Login")]
-        public IActionResult Login([FromBody] Login model)
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = UserList.Where(x => x.UserName == model.UserName).FirstOrDefault();
-
-            if (user == null)
+            try
             {
-                return BadRequest("User not found");
+                if (model == null || model.Email == null || model.Password == null)
+                {
+                    return BadRequest("Username or Password Invalid");
+                }
+
+                var user = await _authLogic.LoginAsync(model.Email);
+
+                if (user == null)
+                {
+                    return BadRequest("Username or Password Invalid");
+                }
+
+                UserModel userModel = new UserModel(user);
+
+                if (userModel == null)
+                {
+                    return BadRequest("Username or Password Invalid");
+                }
+
+                var match = CheckPassword(model.Password, userModel);
+
+                if (!match)
+                {
+                    return BadRequest("Username or Password Invalid");
+                }
+
+                return Ok(await JWTGeneratior(userModel));
             }
-
-            var match = CheckPassword(model.Password, user);
-
-            if (!match)
+            catch (Exception e)
             {
-                return BadRequest("Username Or Password Was Invalid");
+                return BadRequest("Error validating User");
             }
-
-
-
-            return Ok(JWTGeneratior(user));
         }
 
-        public dynamic JWTGeneratior(User user) {
+
+        public async Task<dynamic> JWTGeneratior(UserModel userModel)
+        {
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(this._applicationSettings.Secret);
@@ -52,7 +77,7 @@ namespace Entratix_Backend.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("id", user.UserName), new Claim(ClaimTypes.Role, user.Role) //Si se requieren mas de un rol hay que recorrer aca y agregar mas
+                    new Claim("id", userModel.Email), new Claim(ClaimTypes.Role, userModel.Role)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
@@ -65,15 +90,20 @@ namespace Entratix_Backend.Controllers
 
             var refreshToken = GenerateRefreshToken();
 
-            SetRefreshToken(refreshToken, user);
+            await SetRefreshToken(refreshToken, userModel);
 
-
-            return new {  };
+            return new
+            {
+                token = encrypterToken,
+                refreshToken = refreshToken.Token
+            };
+          
         }
 
-        private RefreshToken GenerateRefreshToken() {
+        private RefreshTokenModel GenerateRefreshToken()
+        {
 
-            var refreshToken = new RefreshToken
+            var refreshToken = new RefreshTokenModel
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
                 Expires = DateTime.UtcNow.AddDays(7),
@@ -99,9 +129,8 @@ namespace Entratix_Backend.Controllers
             return Ok();
         }
 
-        public void SetRefreshToken(RefreshToken refreshToken, User user)
+        public async Task SetRefreshToken(RefreshTokenModel refreshToken, UserModel userModel)
         {
-
             HttpContext.Response.Cookies.Append("X-Refresh-Token", refreshToken.Token, new CookieOptions
             {
                 Expires = refreshToken.Expires,
@@ -111,12 +140,16 @@ namespace Entratix_Backend.Controllers
                 SameSite = SameSiteMode.None
             });
 
-            UserList.Where(x => x.UserName == user.UserName).First().Token = refreshToken.Token;
-            UserList.Where(x => x.UserName == user.UserName).First().TokenCreated = refreshToken.Created;
-            UserList.Where(x => x.UserName == user.UserName).First().TokenExpires = refreshToken.Expires;
+            userModel.Token = refreshToken.Token;
+            userModel.TokenCreated = refreshToken.Created;
+            userModel.TokenExpires = refreshToken.Expires;
+
+            await _authLogic.RefreshTokensAsync(userModel.CreateUserFromModel());
         }
 
-        public void SetJWT(string encrypterToken) {
+
+        public void SetJWT(string encrypterToken)
+        {
             HttpContext.Response.Cookies.Append("X-Access-Token", encrypterToken, new CookieOptions
             {
                 Expires = DateTime.Now.AddMinutes(15),
@@ -130,34 +163,36 @@ namespace Entratix_Backend.Controllers
         [HttpDelete]
         public async Task<IActionResult> RevokeToken(string username)
         {
-            UserList.Where(x => x.UserName == username).Select(x => x.Token = String.Empty);
-        
+            UserList.Where(x => x.Email == username).Select(x => x.Token = String.Empty);
+
             return Ok();
         }
-      
+
 
         [HttpPost("LoginWithGoogle")]
         public async Task<IActionResult> LoginWithGoogle([FromBody] string credential)
-        { 
-            var settings = new GoogleJsonWebSignature.ValidationSettings() { 
-                Audience = new List<string> { this._applicationSettings.GoogleClientId } 
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { this._applicationSettings.GoogleClientId }
             };
 
             var payload = await GoogleJsonWebSignature.ValidateAsync(credential, settings);
 
-            var user = UserList.Where(x=>x.UserName == payload.Email).FirstOrDefault();
+            var user = UserList.Where(x => x.Email == payload.Email).FirstOrDefault();
 
             if (user != null)
             {
                 return Ok(JWTGeneratior(user));
             }
-            else {
+            else
+            {
                 return BadRequest();
             }
-            
+
         }
 
-            private bool CheckPassword(string password, User user)
+        private bool CheckPassword(string password, UserModel user)
         {
             bool result;
 
@@ -172,30 +207,58 @@ namespace Entratix_Backend.Controllers
 
 
         [HttpPost("Register")]
-        public IActionResult Register([FromBody] Register model)
+        public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
         {
-            var user = new User
-            {
-                UserName = model.UserName,
-                Role = model.Role
-            };
 
-            if (model.ConfirmPassword == model.Password)
+            bool isValid = ValidateRegisterModel(registerModel);
+
+            if (!isValid)
             {
-                using (HMACSHA512? hmac = new HMACSHA512())
-                {
-                    user.PasswordSalt = hmac.Key;
-                    user.PasswordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(model.Password));
-                }
-            }
-            else
-            {
-                return BadRequest("Passwords do not match");
+                return BadRequest("Invalid registration data");
             }
 
-            UserList.Add(user);
+            UserModel userModel = registerModel.CreateUserModel();
 
-            return Ok(user);
+
+            using (HMACSHA512? hmac = new HMACSHA512())
+            {
+                userModel.PasswordSalt = hmac.Key;
+                userModel.PasswordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(registerModel.Password));
+            }
+
+            return Ok(await _authLogic.RegisterAsync(userModel.CreateUserFromModel()));
+        }
+
+        public bool ValidateRegisterModel(RegisterModel model)
+        {
+
+            if (model == null)
+                return false;
+
+
+            if (!IsValidEmail(model.Email))
+                return false;
+
+
+
+            if (model.Password != model.ConfirmPassword)
+                return false;
+
+
+            return true;
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
     }

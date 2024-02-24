@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace DataAccess.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class FirstMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,7 +33,12 @@ namespace DataAccess.Migrations
                     firstname = table.Column<string>(type: "text", nullable: false),
                     lastname = table.Column<string>(type: "text", nullable: false),
                     phone = table.Column<string>(type: "text", nullable: false),
-                    email = table.Column<string>(type: "text", nullable: false)
+                    email = table.Column<string>(type: "text", nullable: false),
+                    passwordsalt = table.Column<byte[]>(type: "bytea", nullable: false),
+                    passwordhash = table.Column<byte[]>(type: "bytea", nullable: false),
+                    tokenexpires = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    tokencreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    token = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

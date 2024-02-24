@@ -19,7 +19,7 @@ namespace Entratix_Backend.Controllers
         {
             try
             {
-                var users = _userService.GetUsers();
+                var users = _userService.GetAll();
                 return Ok(users);
             }
             catch(Exception ex)

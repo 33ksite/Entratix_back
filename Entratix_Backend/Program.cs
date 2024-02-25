@@ -12,8 +12,18 @@ using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
+var myOrigins = "_myOrigins";
 ConfigurationManager configuration = builder.Configuration;
 
+// Configure CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myOrigins,
+            policy =>
+            {
+                policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials().SetIsOriginAllowed(hostName => true);
+            });
+});
 // Load appsettings.json configuration
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
@@ -56,17 +66,7 @@ builder.Services.AddDbContext<DbContexto>(options =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthLogic, AuthLogic>();
 
-// Configure CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy",
-        policy =>
-        {
-            policy.AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
-});
+
 
 var app = builder.Build();
 
@@ -77,7 +77,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("CorsPolicy");
+app.UseCors(myOrigins);
 
 app.UseAuthentication();
 

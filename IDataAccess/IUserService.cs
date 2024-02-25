@@ -10,6 +10,8 @@ namespace IDataAccess
 
         Task<User> Get(string userEmail);
 
-        Task<string> Update(User user);
+        Task<User> GetUserByToken(string token);
+
+        Task<string> UpdateToken(User user);
     }
 }

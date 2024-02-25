@@ -16,8 +16,8 @@ namespace DataAccess
 
         public List<string> GetAll()
         {
-            
-          
+
+
             return new List<string> { "user1", "user2", "user3" };
         }
 
@@ -56,7 +56,7 @@ namespace DataAccess
 
 
 
-        public async Task<string> Update(User user)
+        public async Task<string> UpdateToken(User user)
         {
             try
             {
@@ -65,16 +65,9 @@ namespace DataAccess
                 if (existingUser != null)
                 {
                     
-                    existingUser.FirstName = user.FirstName;
-                    existingUser.LastName = user.LastName;
-                    existingUser.Phone = user.Phone;
-                    existingUser.PasswordHash = user.PasswordHash;
-                    existingUser.PasswordSalt = user.PasswordSalt;
                     existingUser.Token = user.Token;
                     existingUser.TokenCreated = user.TokenCreated;
                     existingUser.TokenExpires = user.TokenExpires;
-                    
-
 
 
                     await _dbContexto.SaveChangesAsync();
@@ -91,7 +84,19 @@ namespace DataAccess
             }
         }
 
+        public async Task<User> GetUserByToken(string token)
+        {
+            try
+            {
+                return await _dbContexto.Users.FirstOrDefaultAsync(x => x.Token == token);
+            }
+            catch (Exception ex)
+            {
 
+                Console.WriteLine($"An error occurred while finding user by token: {ex.Message}");
+                return null;
+            }
+        }
 
     }
 }

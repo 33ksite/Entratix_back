@@ -37,7 +37,7 @@ namespace Entratix_Backend.Controllers
                     return BadRequest("Username or Password Invalid");
                 }
 
-                var user = await _authLogic.LoginAsync(model.Email);
+                var user = await _authLogic.GetUserAsync(model.Email);
 
                 if (user == null)
                 {
@@ -77,7 +77,7 @@ namespace Entratix_Backend.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("id", userModel.Email), new Claim(ClaimTypes.Role, userModel.Role)
+                    new Claim("email", userModel.Email), new Claim(ClaimTypes.Role, userModel.Role)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
@@ -117,16 +117,24 @@ namespace Entratix_Backend.Controllers
         {
             var refreshToken = Request.Cookies["X-Refresh-Token"];
 
-            var user = UserList.Where(x => x.Token == refreshToken).FirstOrDefault();
-
-            if (user == null || user.TokenExpires < DateTime.Now)
+            if (string.IsNullOrEmpty(refreshToken))
             {
                 return Unauthorized("Token has expired");
             }
 
-            JWTGeneratior(user);
+            var user = await _authLogic.GetUserByTokenAsync(refreshToken);
+
+            if (user == null || user.Token != refreshToken || user.TokenExpires < DateTime.Now )
+            {
+                return Unauthorized("Token has expired");
+            } 
+
+            UserModel userModel = new UserModel(user);
+
+            await JWTGeneratior(userModel);
 
             return Ok();
+           
         }
 
         public async Task SetRefreshToken(RefreshTokenModel refreshToken, UserModel userModel)
@@ -160,12 +168,69 @@ namespace Entratix_Backend.Controllers
             });
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> RevokeToken(string username)
+        [HttpDelete("RevokeToken")]
+        public async Task<IActionResult> RevokeToken()
         {
-            UserList.Where(x => x.Email == username).Select(x => x.Token = String.Empty);
+
+            var token = Request.Cookies["X-Access-Token"];
+
+            if (token == null)
+            {
+                return BadRequest("Invalid operation");
+            }
+
+            var email = GetEmailFromToken(token);
+
+            if (email == null)
+            {
+                return BadRequest("Invalid operation");
+            }
+
+            var user = await _authLogic.GetUserAsync(email);
+
+            if (user == null)
+            {
+                return BadRequest("Invalid operation");
+            }
+
+            user.Token = null;
+            user.TokenCreated = null;
+            user.TokenExpires = null;
+
+            await _authLogic.RevokeToken(user);
+            DeleteJWT("X-Access-Token");
+            DeleteJWT("X-Refresh-Token");
 
             return Ok();
+        }
+
+        public void DeleteJWT(string key)
+        {
+            HttpContext.Response.Cookies.Delete(key, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None
+            });
+        }
+
+        public string? GetEmailFromToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+
+                
+                var emailClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email);
+
+                return emailClaim?.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while decoding the token: {ex.Message}");
+                return null; 
+            }
         }
 
 
@@ -179,15 +244,17 @@ namespace Entratix_Backend.Controllers
 
             var payload = await GoogleJsonWebSignature.ValidateAsync(credential, settings);
 
-            var user = UserList.Where(x => x.Email == payload.Email).FirstOrDefault();
+            var user = await _authLogic.GetUserAsync(payload.Email);
 
             if (user != null)
             {
-                return Ok(JWTGeneratior(user));
+                UserModel userModel = new UserModel(user);
+
+                return Ok(await JWTGeneratior(userModel));
             }
             else
             {
-                return BadRequest();
+                return BadRequest("Username or Password Invalid");
             }
 
         }

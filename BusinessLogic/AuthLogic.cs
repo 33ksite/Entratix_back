@@ -13,7 +13,7 @@ namespace BusinessLogic
             _userService = userService;
         }
 
-        public async Task<User> LoginAsync(string userEmail)
+        public async Task<User> GetUserAsync(string userEmail)
         {
             return await _userService.Get(userEmail);
         }
@@ -25,7 +25,17 @@ namespace BusinessLogic
 
         public async Task<string> RefreshTokensAsync(User user)
         {
-            return await _userService.Update(user);
+            return await _userService.UpdateToken(user);
+        }
+
+        public async Task<User> GetUserByTokenAsync(string token)
+        {
+            return await _userService.GetUserByToken(token);
+        }
+
+        public async Task<string> RevokeToken(User user)
+        {
+            return await _userService.UpdateToken(user);
         }
 
 

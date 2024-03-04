@@ -23,6 +23,7 @@ builder.Services.AddDbContext<DbContexto>(options =>
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserLogic, UserLogic>();
+builder.Services.AddScoped<IEventService, EventService>();
 
 
 // Configure CORS policy

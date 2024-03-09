@@ -7,6 +7,7 @@ namespace DataAccess.Contexts
     {
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Event> Events { get; set; }
 
         public DbContexto(DbContextOptions<DbContexto> options) : base(options) { }
 
@@ -20,6 +21,11 @@ namespace DataAccess.Contexts
             modelBuilder.Entity<User>().Property(r => r.Id).HasColumnName("id");
             modelBuilder.Entity<User>().HasKey(u => u.Id);
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<Event>().ToTable("events");
+            modelBuilder.Entity<Event>().Property(e => e.Id).HasColumnName("id");
+            modelBuilder.Entity<Event>().HasKey(e => e.Id);
+            modelBuilder.Entity<Event>().HasOne(e => e.User).WithMany(u => u.Events).HasForeignKey(e => e.UserId);
         }
     }
 }

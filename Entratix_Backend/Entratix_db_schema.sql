@@ -1,3 +1,10 @@
+DROP TABLE IF EXISTS TicketPurchases;
+DROP TABLE IF EXISTS EventTickets;
+DROP TABLE IF EXISTS TicketTypes;
+DROP TABLE IF EXISTS Events;
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Roles;
+
 -- Create the table Roles
 CREATE TABLE Roles (
     id INT PRIMARY KEY,
@@ -31,15 +38,16 @@ CREATE TABLE Events (
     id INT PRIMARY KEY,
     userId INT REFERENCES Users(id),
     name VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
     location VARCHAR(255),
-    date DATE,
-    cost DECIMAL(10, 2)
+    cost DECIMAL(10, 2),
+    photo VARCHAR(255)
 );
 
 -- Insert events
-INSERT INTO Events (id, userId, name, location, date, cost) VALUES
-(1, 1, 'Event1', 'Location1', '2024-02-01', 20.00),
-(2, 2, 'Event2', 'Location2', '2024-03-15', 30.00);
+INSERT INTO Events (id, userId, name, date, location, cost, photo) VALUES
+(1, 3, 'Event1', '2020-12-01', 'Location1', 100.00, 'https://i.imgur.com/3GUDX4V.jpg'),
+(2, 3, 'Event2', '2020-12-15', 'Location2', 150.00, 'https://www.metro951.com/wp-content/uploads/2023/11/ANUNCIO-FEED-DAVID-GUETTA.jpg');
 
 -- Create the table TicketTypes
 CREATE TABLE TicketTypes (

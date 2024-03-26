@@ -1,9 +1,10 @@
-DROP TABLE IF EXISTS TicketPurchases;
-DROP TABLE IF EXISTS EventTickets;
-DROP TABLE IF EXISTS TicketTypes;
-DROP TABLE IF EXISTS Events;
-DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS Roles;
+DROP TABLE IF EXISTS EventTickets CASCADE;
+DROP TABLE IF EXISTS TicketPurchases CASCADE;
+DROP TABLE IF EXISTS Events CASCADE;
+DROP TABLE IF EXISTS Users CASCADE;
+DROP TABLE IF EXISTS TicketTypes CASCADE;
+DROP TABLE IF EXISTS Roles CASCADE;
+
 
 -- Create the table Roles
 CREATE TABLE Roles (
@@ -13,25 +14,32 @@ CREATE TABLE Roles (
 
 -- Insert roles
 INSERT INTO Roles (id, type) VALUES
-(1, 'administrator'),
-(2, 'RPP'),
-(3, 'producer');
+(1, 'User'),
+(2, 'RRPP'),
+(3, 'Producer'),
+(4, 'Administrator');
 
 -- Create the table Users
 CREATE TABLE Users (
-    Id INT PRIMARY KEY,
-    RoleId INT REFERENCES Roles(id),
-    FirstName VARCHAR(255) NOT NULL,
-    LastName VARCHAR(255) NOT NULL,
+    Id SERIAL PRIMARY KEY,
+    RoleId INT NOT NULL REFERENCES Roles(id),
+    FirstName VARCHAR(100) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
     Phone VARCHAR(20),
-    Email VARCHAR(255) UNIQUE NOT NULL
+    Email VARCHAR(255) UNIQUE NOT NULL,
+    PasswordSalt BYTEA NOT NULL,
+    PasswordHash BYTEA NOT NULL,
+    TokenExpires TIMESTAMP,
+    TokenCreated TIMESTAMP,
+    Token VARCHAR(255)
 );
 
--- Insert users
-INSERT INTO Users (Id, RoleId, FirstName, LastName, Phone, Email) VALUES
-(1, 1, 'Name1', 'Surname1', '123456789', 'user1@example.com'),
-(2, 2, 'Name2', 'Surname2', '987654321', 'user2@example.com'),
-(3, 3, 'Name3', 'Surname3', '555555555', 'user3@example.com');
+INSERT INTO Users (RoleId, FirstName, LastName, Phone, Email, PasswordSalt, PasswordHash, TokenExpires, TokenCreated, Token) 
+VALUES 
+(1, 'John', 'Doe', '123456789', 'john.doe@example.com', 'salt123', 'hash123', '2025-02-24', '2024-02-24', 'token123'),
+(2, 'Alice', 'Smith', '987654321', 'alice.smith@example.com', 'salt456', 'hash456', '2025-02-24', '2024-02-24', 'token456'),
+(3, 'Bob', 'Johnson', '555555555', 'bob.johnson@example.com', 'salt789', 'hash789', '2025-02-24', '2024-02-24', 'token789');
+
 
 -- Create the table Events
 CREATE TABLE Events (

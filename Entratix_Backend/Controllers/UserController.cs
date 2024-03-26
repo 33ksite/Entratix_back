@@ -14,18 +14,5 @@ namespace Entratix_Backend.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetUsers()
-        {
-            try
-            {
-                var users = _userService.GetUsers();
-                return Ok(users);
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
     }
 }

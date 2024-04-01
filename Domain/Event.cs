@@ -10,6 +10,8 @@ namespace Domain
         public int UserId { get; set; }
         [Column("name")]
         public string Name { get; set; }
+        [Column("description")]
+        public string Description { get; set; }
         [Column("date")]
         public DateTime Date { get; set; }
         [Column("location")]

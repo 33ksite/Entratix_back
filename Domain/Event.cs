@@ -20,6 +20,8 @@ namespace Domain
         public decimal Cost { get; set; }
         [Column("photo")]
         public string Photo { get; set; }
+        [Column("department")]
+        public string Department { get; set; }
         public User User { get; set; }
     }
 }

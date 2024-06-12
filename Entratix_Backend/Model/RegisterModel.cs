@@ -29,6 +29,7 @@ namespace Entratix_Backend.Model
                 Phone = this.Phone ?? "", 
                 PasswordSalt = new byte[0],
                 PasswordHash = new byte[0],
+                Role = "User",
                 Token = "",
                 TokenCreated = DateTime.MinValue,
                 TokenExpires = DateTime.MinValue

@@ -67,6 +67,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthLogic, AuthLogic>();
 builder.Services.AddScoped<IUserLogic, UserLogic>();
 builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<ITicketPurchaseService, TicketPurchaseService>();
+builder.Services.AddScoped<ITicketPurchaseLogic, TicketPurchaseLogic>();
+
 
 
 

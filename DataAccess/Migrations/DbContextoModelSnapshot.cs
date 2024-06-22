@@ -39,6 +39,11 @@ namespace DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date");
 
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("department");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
@@ -70,6 +75,27 @@ namespace DataAccess.Migrations
                     b.ToTable("events", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.EventTicket", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer")
+                        .HasColumnName("eventid");
+
+                    b.Property<int>("TicketTypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("tickettypeid");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.HasKey("EventId", "TicketTypeId");
+
+                    b.HasIndex("TicketTypeId");
+
+                    b.ToTable("eventtickets", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -87,6 +113,60 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("roles", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.TicketPurchase", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("userid");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer")
+                        .HasColumnName("eventid");
+
+                    b.Property<int>("TicketTypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("tickettypeid");
+
+                    b.Property<int>("QuantityPurchased")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity_purchased");
+
+                    b.Property<bool>("Used")
+                        .HasColumnType("boolean")
+                        .HasColumnName("used");
+
+                    b.HasKey("UserId", "EventId", "TicketTypeId");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("TicketTypeId");
+
+                    b.ToTable("ticketpurchases", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.TicketType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tickettypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.User", b =>
@@ -163,9 +243,71 @@ namespace DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.EventTicket", b =>
+                {
+                    b.HasOne("Domain.Event", "Event")
+                        .WithMany("EventTickets")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.TicketType", "TicketType")
+                        .WithMany("EventTickets")
+                        .HasForeignKey("TicketTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("TicketType");
+                });
+
+            modelBuilder.Entity("Domain.TicketPurchase", b =>
+                {
+                    b.HasOne("Domain.Event", "Event")
+                        .WithMany("TicketPurchases")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.TicketType", "TicketType")
+                        .WithMany("TicketPurchases")
+                        .HasForeignKey("TicketTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User", "User")
+                        .WithMany("TicketPurchases")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("TicketType");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Event", b =>
+                {
+                    b.Navigation("EventTickets");
+
+                    b.Navigation("TicketPurchases");
+                });
+
+            modelBuilder.Entity("Domain.TicketType", b =>
+                {
+                    b.Navigation("EventTickets");
+
+                    b.Navigation("TicketPurchases");
+                });
+
             modelBuilder.Entity("Domain.User", b =>
                 {
                     b.Navigation("Events");
+
+                    b.Navigation("TicketPurchases");
                 });
 #pragma warning restore 612, 618
         }

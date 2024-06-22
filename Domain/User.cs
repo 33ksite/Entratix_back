@@ -45,6 +45,7 @@ namespace Domain
         {
         }
         public List<Event> Events { get; set; }
+        public List<TicketPurchase> TicketPurchases { get; set; }
 
         public User(int roleId, string firstName, string lastName, string phone, string email)
         {

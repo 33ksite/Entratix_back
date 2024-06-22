@@ -22,6 +22,9 @@ namespace Domain
         public string Photo { get; set; }
         [Column("department")]
         public string Department { get; set; }
+
         public User User { get; set; }
+        public List<EventTicket> EventTickets { get; set; }
+        public List<TicketPurchase> TicketPurchases { get; set; }
     }
 }

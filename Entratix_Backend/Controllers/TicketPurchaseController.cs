@@ -2,11 +2,12 @@
 using Entratix_Backend.DTOs;
 using IBusinessLogic;
 using Domain;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Entratix_Backend.Controllers
 {
     [ApiController]
+    [Authorize(Roles = "User,Admin,HR")]
     [Route("[controller]")]
     public class TicketPurchaseController : ControllerBase
     {

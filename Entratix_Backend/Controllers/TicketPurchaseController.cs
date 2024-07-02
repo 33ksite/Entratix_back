@@ -3,6 +3,8 @@ using Entratix_Backend.DTOs;
 using IBusinessLogic;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+using Entratix_Backend.Utilities;
 
 namespace Entratix_Backend.Controllers
 {
@@ -12,10 +14,12 @@ namespace Entratix_Backend.Controllers
     public class TicketPurchaseController : ControllerBase
     {
         private readonly ITicketPurchaseLogic _ticketPurchaseLogic;
+        private readonly TokenManager _tokenManager;
 
-        public TicketPurchaseController(ITicketPurchaseLogic ticketPurchaseLogic)
+        public TicketPurchaseController(ITicketPurchaseLogic ticketPurchaseLogic, IOptions<AppSettings> appSettings)
         {
             _ticketPurchaseLogic = ticketPurchaseLogic;
+            _tokenManager = new TokenManager(appSettings);
         }
 
         [HttpPost]
@@ -23,14 +27,26 @@ namespace Entratix_Backend.Controllers
         {
             try
             {
-                // Map DTO to entity
+
+                var authHeader = Request.Cookies["X-Access-Token"];
+                if (string.IsNullOrEmpty(authHeader))
+                {
+                    return Unauthorized("Invalid or missing token");
+                }
+
+                var userId = _tokenManager.GetUserIdFromToken(authHeader);
+                if (userId == null)
+                {
+                    return Unauthorized("Invalid or missing token");
+                }
+
                 var ticketPurchase = new TicketPurchase
                 {
-                    UserId = ticketPurchaseDTO.UserId,
+                    UserId = userId.Value,
                     EventId = ticketPurchaseDTO.EventId,
                     TicketTypeId = ticketPurchaseDTO.TicketTypeId,
                     QuantityPurchased = ticketPurchaseDTO.QuantityPurchased,
-                    Used = ticketPurchaseDTO.Used
+                    Used = false
                 };
 
                 var result = await _ticketPurchaseLogic.PurchaseTicket(ticketPurchase);

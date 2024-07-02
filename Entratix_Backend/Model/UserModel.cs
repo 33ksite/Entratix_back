@@ -4,6 +4,7 @@ namespace Entratix_Backend.Model
 {
     public class UserModel
     {
+        public int Id { get; set; }
         [Required]
         public string FirstName { get; set; }
         [Required]
@@ -31,7 +32,7 @@ namespace Entratix_Backend.Model
         {
             User user = new User
             {
-
+                Id = this.Id,
                 FirstName = this.FirstName,
                 LastName = this.LastName,
                 Email = this.Email,
@@ -52,6 +53,7 @@ namespace Entratix_Backend.Model
 
         public UserModel(User user)
         {
+            Id = user.Id;
             FirstName = user.FirstName;
             LastName = user.LastName;
             Email = user.Email;

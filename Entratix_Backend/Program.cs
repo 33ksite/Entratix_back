@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
 var builder = WebApplication.CreateBuilder(args);
 var myOrigins = "_myOrigins";
 ConfigurationManager configuration = builder.Configuration;
@@ -61,14 +60,14 @@ builder.Services.AddAuthentication(x =>
 var connectionString = configuration.GetConnectionString("PostgreSQL");
 Console.WriteLine($"Cadena de conexion a la base de datos: {connectionString}");
 builder.Services.AddDbContext<DbContexto>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Entratix_Backend")));
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthLogic, AuthLogic>();
 builder.Services.AddScoped<IUserLogic, UserLogic>();
 builder.Services.AddScoped<IEventService, EventService>();
-
-
+builder.Services.AddScoped<ITicketPurchaseService, TicketPurchaseService>();
+builder.Services.AddScoped<ITicketPurchaseLogic, TicketPurchaseLogic>();
 
 var app = builder.Build();
 

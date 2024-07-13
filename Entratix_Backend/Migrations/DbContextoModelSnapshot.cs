@@ -3,19 +3,17 @@ using System;
 using DataAccess.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DataAccess.Migrations
+namespace Entratix_Backend.Migrations
 {
     [DbContext(typeof(DbContexto))]
-    [Migration("20240330023116_FirstMigration")]
-    partial class FirstMigration
+    partial class DbContextoModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,6 +38,11 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date");
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("department");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -72,6 +75,29 @@ namespace DataAccess.Migrations
                     b.ToTable("events", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.EventTicket", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer")
+                        .HasColumnName("eventid");
+
+                    b.Property<string>("Entry")
+                        .HasColumnType("text")
+                        .HasColumnName("entry");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.HasKey("EventId", "Entry");
+
+                    b.ToTable("eventtickets", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -89,6 +115,35 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("roles", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.TicketPurchase", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("userid");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer")
+                        .HasColumnName("eventid");
+
+                    b.Property<string>("Entry")
+                        .HasColumnType("text")
+                        .HasColumnName("entry");
+
+                    b.Property<int>("QuantityPurchased")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity_purchased");
+
+                    b.Property<bool>("Used")
+                        .HasColumnType("boolean")
+                        .HasColumnName("used");
+
+                    b.HasKey("UserId", "EventId", "Entry");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("ticketpurchases", (string)null);
                 });
 
             modelBuilder.Entity("Domain.User", b =>
@@ -165,9 +220,48 @@ namespace DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.EventTicket", b =>
+                {
+                    b.HasOne("Domain.Event", "Event")
+                        .WithMany("EventTickets")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Domain.TicketPurchase", b =>
+                {
+                    b.HasOne("Domain.Event", "Event")
+                        .WithMany("TicketPurchases")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User", "User")
+                        .WithMany("TicketPurchases")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Event", b =>
+                {
+                    b.Navigation("EventTickets");
+
+                    b.Navigation("TicketPurchases");
+                });
+
             modelBuilder.Entity("Domain.User", b =>
                 {
                     b.Navigation("Events");
+
+                    b.Navigation("TicketPurchases");
                 });
 #pragma warning restore 612, 618
         }

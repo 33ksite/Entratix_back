@@ -14,8 +14,8 @@ namespace Domain
         public int EventId { get; set; }
 
         [Required]
-        [Column("tickettypeid")]
-        public int TicketTypeId { get; set; }
+        [Column("entry")]
+        public string Entry { get; set; }
 
         [Required]
         [Column("quantity_purchased")]
@@ -26,6 +26,5 @@ namespace Domain
 
         public User User { get; set; }
         public Event Event { get; set; }
-        public TicketType TicketType { get; set; }
     }
 }

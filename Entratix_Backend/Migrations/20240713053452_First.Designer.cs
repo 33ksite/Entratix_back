@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DataAccess.Migrations
+namespace Entratix_Backend.Migrations
 {
     [DbContext(typeof(DbContexto))]
-    [Migration("20240622225142_First")]
+    [Migration("20240713053452_First")]
     partial class First
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,17 +83,19 @@ namespace DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("eventid");
 
-                    b.Property<int>("TicketTypeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tickettypeid");
+                    b.Property<string>("Entry")
+                        .HasColumnType("text")
+                        .HasColumnName("entry");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
 
-                    b.HasKey("EventId", "TicketTypeId");
-
-                    b.HasIndex("TicketTypeId");
+                    b.HasKey("EventId", "Entry");
 
                     b.ToTable("eventtickets", (string)null);
                 });
@@ -127,9 +129,9 @@ namespace DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("eventid");
 
-                    b.Property<int>("TicketTypeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tickettypeid");
+                    b.Property<string>("Entry")
+                        .HasColumnType("text")
+                        .HasColumnName("entry");
 
                     b.Property<int>("QuantityPurchased")
                         .HasColumnType("integer")
@@ -139,36 +141,11 @@ namespace DataAccess.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("used");
 
-                    b.HasKey("UserId", "EventId", "TicketTypeId");
+                    b.HasKey("UserId", "EventId", "Entry");
 
                     b.HasIndex("EventId");
 
-                    b.HasIndex("TicketTypeId");
-
                     b.ToTable("ticketpurchases", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.TicketType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("tickettypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.User", b =>
@@ -253,15 +230,7 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.TicketType", "TicketType")
-                        .WithMany("EventTickets")
-                        .HasForeignKey("TicketTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Event");
-
-                    b.Navigation("TicketType");
                 });
 
             modelBuilder.Entity("Domain.TicketPurchase", b =>
@@ -269,12 +238,6 @@ namespace DataAccess.Migrations
                     b.HasOne("Domain.Event", "Event")
                         .WithMany("TicketPurchases")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.TicketType", "TicketType")
-                        .WithMany("TicketPurchases")
-                        .HasForeignKey("TicketTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -286,19 +249,10 @@ namespace DataAccess.Migrations
 
                     b.Navigation("Event");
 
-                    b.Navigation("TicketType");
-
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Event", b =>
-                {
-                    b.Navigation("EventTickets");
-
-                    b.Navigation("TicketPurchases");
-                });
-
-            modelBuilder.Entity("Domain.TicketType", b =>
                 {
                     b.Navigation("EventTickets");
 

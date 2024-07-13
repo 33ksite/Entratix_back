@@ -19,11 +19,11 @@ namespace DataAccess
         {
             try
             {
-                // Verificar si ya existe una compra de ticket con los mismos UserId, EventId y TicketTypeId
+                // Verify if there is an existing purchase with the same UserId, EventId, and Entry
                 var existingPurchase = await _dbContexto.TicketPurchases
                     .FirstOrDefaultAsync(tp => tp.UserId == ticketPurchase.UserId &&
                                                tp.EventId == ticketPurchase.EventId &&
-                                               tp.TicketTypeId == ticketPurchase.TicketTypeId);
+                                               tp.Entry == ticketPurchase.Entry);
 
                 if (existingPurchase != null)
                 {
@@ -32,14 +32,13 @@ namespace DataAccess
                 }
                 else
                 {
-                    // Cargar entidades relacionadas
+                    // Load related entities
                     ticketPurchase.User = await _dbContexto.Users.FindAsync(ticketPurchase.UserId);
                     ticketPurchase.Event = await _dbContexto.Events.FindAsync(ticketPurchase.EventId);
-                    ticketPurchase.TicketType = await _dbContexto.TicketTypes.FindAsync(ticketPurchase.TicketTypeId);
 
-                    if (ticketPurchase.User == null || ticketPurchase.Event == null || ticketPurchase.TicketType == null)
+                    if (ticketPurchase.User == null || ticketPurchase.Event == null)
                     {
-                        return "User, Event, or TicketType not found";
+                        return "User or Event not found";
                     }
 
                     _dbContexto.TicketPurchases.Add(ticketPurchase);

@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DataAccess.Migrations
+namespace Entratix_Backend.Migrations
 {
     public partial class First : Migration
     {
@@ -21,20 +21,6 @@ namespace DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_roles", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "tickettypes",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    name = table.Column<string>(type: "text", nullable: false),
-                    price = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_tickettypes", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -90,22 +76,17 @@ namespace DataAccess.Migrations
                 columns: table => new
                 {
                     eventid = table.Column<int>(type: "integer", nullable: false),
-                    tickettypeid = table.Column<int>(type: "integer", nullable: false),
-                    quantity = table.Column<int>(type: "integer", nullable: false)
+                    entry = table.Column<string>(type: "text", nullable: false),
+                    quantity = table.Column<int>(type: "integer", nullable: false),
+                    price = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_eventtickets", x => new { x.eventid, x.tickettypeid });
+                    table.PrimaryKey("PK_eventtickets", x => new { x.eventid, x.entry });
                     table.ForeignKey(
                         name: "FK_eventtickets_events_eventid",
                         column: x => x.eventid,
                         principalTable: "events",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_eventtickets_tickettypes_tickettypeid",
-                        column: x => x.tickettypeid,
-                        principalTable: "tickettypes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -116,23 +97,17 @@ namespace DataAccess.Migrations
                 {
                     userid = table.Column<int>(type: "integer", nullable: false),
                     eventid = table.Column<int>(type: "integer", nullable: false),
-                    tickettypeid = table.Column<int>(type: "integer", nullable: false),
+                    entry = table.Column<string>(type: "text", nullable: false),
                     quantity_purchased = table.Column<int>(type: "integer", nullable: false),
                     used = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ticketpurchases", x => new { x.userid, x.eventid, x.tickettypeid });
+                    table.PrimaryKey("PK_ticketpurchases", x => new { x.userid, x.eventid, x.entry });
                     table.ForeignKey(
                         name: "FK_ticketpurchases_events_eventid",
                         column: x => x.eventid,
                         principalTable: "events",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ticketpurchases_tickettypes_tickettypeid",
-                        column: x => x.tickettypeid,
-                        principalTable: "tickettypes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -149,19 +124,9 @@ namespace DataAccess.Migrations
                 column: "userid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_eventtickets_tickettypeid",
-                table: "eventtickets",
-                column: "tickettypeid");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ticketpurchases_eventid",
                 table: "ticketpurchases",
                 column: "eventid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ticketpurchases_tickettypeid",
-                table: "ticketpurchases",
-                column: "tickettypeid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_email",
@@ -183,9 +148,6 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "events");
-
-            migrationBuilder.DropTable(
-                name: "tickettypes");
 
             migrationBuilder.DropTable(
                 name: "users");

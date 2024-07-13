@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using IDataAccess;
 using Domain;
+using Entratix_Backend.Model;
 
 namespace Entratix_Backend.Controllers
 {
@@ -20,7 +21,8 @@ namespace Entratix_Backend.Controllers
             try
             {
                 var events = await _eventService.GetEvents();
-                return Ok(events);
+                var eventModels = events.Select(e => new EventModel(e)).ToList();
+                return Ok(eventModels);
             }
             catch (Exception ex)
             {
@@ -35,7 +37,12 @@ namespace Entratix_Backend.Controllers
             try
             {
                 var eventToReturn = await _eventService.GetEvent(id);
-                return Ok(eventToReturn);
+                if (eventToReturn == null)
+                {
+                    return NotFound("Event not found");
+                }
+                var eventModel = new EventModel(eventToReturn);
+                return Ok(eventModel);
             }
             catch (Exception ex)
             {
@@ -44,12 +51,14 @@ namespace Entratix_Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateEvent(Event newEvent)
+        public async Task<IActionResult> CreateEvent(EventModel newEventModel)
         {
             try
             {
+                var newEvent = EventModel.CreateEventModel(newEventModel);
                 var createdEvent = await _eventService.CreateEvent(newEvent);
-                return Ok(createdEvent);
+                var createdEventModel = new EventModel(createdEvent);
+                return Ok(createdEventModel);
             }
             catch (Exception ex)
             {
@@ -58,12 +67,33 @@ namespace Entratix_Backend.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateEvent(Event eventToUpdate)
+        public async Task<IActionResult> UpdateEvent(EventModel eventModel)
         {
             try
             {
+                var eventToUpdate = await _eventService.GetEvent(eventModel.Id);
+                if (eventToUpdate == null)
+                {
+                    return NotFound("Event not found");
+                }
+
+                eventToUpdate.Name = eventModel.Name;
+                eventToUpdate.Description = eventModel.Description;
+                eventToUpdate.Date = eventModel.Date;
+                eventToUpdate.Location = eventModel.Location;
+                eventToUpdate.Cost = eventModel.Cost;
+                eventToUpdate.Photo = eventModel.Photo;
+                eventToUpdate.Department = eventModel.Department;
+                eventToUpdate.EventTickets = eventModel.EventTickets.Select(et => new EventTicket
+                {
+                    Entry = et.Entry,
+                    Quantity = et.Quantity,
+                    Price = et.Price
+                }).ToList();
+
                 var updatedEvent = await _eventService.UpdateEvent(eventToUpdate);
-                return Ok(updatedEvent);
+                var updatedEventModel = new EventModel(updatedEvent);
+                return Ok(updatedEventModel);
             }
             catch (Exception ex)
             {
@@ -78,7 +108,12 @@ namespace Entratix_Backend.Controllers
             try
             {
                 var deletedEvent = await _eventService.DeleteEvent(id);
-                return Ok(deletedEvent);
+                if (deletedEvent == null)
+                {
+                    return NotFound("Event not found");
+                }
+                var deletedEventModel = new EventModel(deletedEvent);
+                return Ok(deletedEventModel);
             }
             catch (Exception ex)
             {

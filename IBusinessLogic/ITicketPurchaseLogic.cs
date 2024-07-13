@@ -5,6 +5,6 @@ namespace IBusinessLogic
 {
     public interface ITicketPurchaseLogic
     {
-        Task<string> PurchaseTicket(TicketPurchase ticketPurchase);
+        Task<bool> PurchaseTickets(List<TicketPurchase> ticketPurchases);
     }
 }

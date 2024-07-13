@@ -14,39 +14,43 @@ namespace DataAccess
             _dbContexto = dbContexto;
         }
 
-        public Task<Event> CreateEvent(Event newEvent)
+        public async Task<Event> CreateEvent(Event newEvent)
         {
             _dbContexto.Events.Add(newEvent);
-            _dbContexto.SaveChanges();
+            await _dbContexto.SaveChangesAsync();
 
-            return Task.FromResult(newEvent);
+            return newEvent;
         }
 
-        public Task<Event> DeleteEvent(int id)
+        public async Task<Event> DeleteEvent(int id)
         {
-            var eventToDelete = _dbContexto.Events.FirstOrDefault(e => e.Id == id);
+            var eventToDelete = await _dbContexto.Events.FindAsync(id);
             _dbContexto.Events.Remove(eventToDelete);
-            _dbContexto.SaveChanges();
-            return Task.FromResult(eventToDelete);
+            await _dbContexto.SaveChangesAsync();
+            return eventToDelete;
         }
 
-        public Task<Event> GetEvent(int id)
+        public async Task<Event> GetEvent(int id)
         {
-            var eventToReturn = _dbContexto.Events.FirstOrDefault(e => e.Id == id);
-            return Task.FromResult(eventToReturn);
+            var eventToReturn = await _dbContexto.Events
+                .Include(e => e.EventTickets)
+                .FirstOrDefaultAsync(e => e.Id == id);
+            return eventToReturn;
         }
 
-        public Task<List<Event>> GetEvents()
+        public async Task<List<Event>> GetEvents()
         {
-            var events = _dbContexto.Events.ToList();
-            return Task.FromResult(events);
+            var events = await _dbContexto.Events
+                .Include(e => e.EventTickets)
+                .ToListAsync();
+            return events;
         }
 
-        public Task<Event> UpdateEvent(Event eventToUpdate)
+        public async Task<Event> UpdateEvent(Event eventToUpdate)
         {
             _dbContexto.Entry(eventToUpdate).State = EntityState.Modified;
-            _dbContexto.SaveChanges();
-            return Task.FromResult(eventToUpdate);
+            await _dbContexto.SaveChangesAsync();
+            return eventToUpdate;
         }
     }
 }

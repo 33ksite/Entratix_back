@@ -2,7 +2,6 @@ DROP TABLE IF EXISTS eventtickets;
 DROP TABLE IF EXISTS ticketpurchases;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS tickettypes;
 DROP TABLE IF EXISTS roles;
 
 -- Create the table Roles
@@ -39,29 +38,14 @@ CREATE TABLE events (
     department VARCHAR(255)
 );
 
--- Create the table TicketTypes
-CREATE TABLE tickettypes (
-    id INT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL
-);
-
--- Create the table EventTickets to relate Events with TicketTypes
-CREATE TABLE eventtickets (
-    eventid INT REFERENCES events(id),
-    tickettypeid INT REFERENCES tickettypes(id),
-    quantity INT NOT NULL,
-    PRIMARY KEY (eventid, tickettypeid)
-);
-
 -- Create the table TicketPurchases to relate Users with EventTickets
 CREATE TABLE ticketpurchases (
     userid INT REFERENCES users(id),
     eventid INT REFERENCES events(id),
-    tickettypeid INT REFERENCES tickettypes(id),
+    entry VARCHAR(255) NOT NULL,
     quantity_purchased INT,
     used BOOLEAN DEFAULT FALSE,
-    PRIMARY KEY (userid, eventid, tickettypeid)
+    PRIMARY KEY (userid, eventid, entry)
 );
 
 -- Insert roles
@@ -93,19 +77,67 @@ INSERT INTO events (id, userid, name, description, date, location, cost, photo, 
 (2, 2, 'Key on Tour - Buenos Aires 2024','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', '2020-12-14',  'Palermo 1412', 150.00, 'https://api.entraste.com/sc/uploads/file/a62398317b510a52ef5370cbec261de7','Montevideo'),
 (3, 3, 'Room - DJ Detected b2b DJ Koolt','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', '2024-12-15',  'Paysandu 1351, esq Rondo', 150.00, 'https://static.ra.co/images/news/2019/dj-koolt-ade-ra-live-motd.jpg','Montevideo');
 
--- Insert ticket types
-INSERT INTO tickettypes (id, name, price) VALUES
-(1, 'General Admission', 20.00),
-(2, 'VIP', 50.00);
+-- Create the table EventTickets with id, entry, and price columns
+CREATE TABLE eventtickets (
+    id SERIAL PRIMARY KEY,
+    eventid INT REFERENCES events(id),
+    entry VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL
+);
 
 -- Insert associations of ticket types with events
-INSERT INTO eventtickets (eventid, tickettypeid, quantity) VALUES
-(1, 1, 100), -- 100 general admission tickets for event 1
-(1, 2, 50),  -- 50 VIP tickets for event 1
-(2, 1, 200); -- 200 general admission tickets for event 2
+INSERT INTO eventtickets (entry, eventid, quantity, price) VALUES
+('General Admission',1, 100, 1000.00), -- 100 general admission tickets for event 1
+('VIP',1, 50, 1500.00),                -- 50 VIP tickets for event 1
+('Premium',1, 30, 2000.00),            -- 30 Premium tickets for event 1
+
+('General Admission',2, 150, 1000.00), -- 150 general admission tickets for event 2
+('VIP',2, 75, 1500.00),                -- 75 VIP tickets for event 2
+('Mesa',2, 50, 2000.00),               -- 50 Mesa tickets for event 2
+
+('General Admission', 3, 200, 1000.00), -- 200 general admission tickets for event 3
+('VIP', 3, 100, 1500.00),               -- 100 VIP tickets for event 3
+('Box', 3, 20, 3000.00),               -- 20 Box tickets for event 3
+
+('General Admission', 12, 100, 1000.00), -- 100 general admission tickets for event 12
+('VIP', 12, 50, 1500.00),               -- 50 VIP tickets for event 12
+('Premium', 12, 30, 2000.00),           -- 30 Premium tickets for event 12
+
+('General Admission', 10, 150, 1000.00), -- 150 general admission tickets for event 10
+('VIP', 10, 75, 1500.00),                -- 75 VIP tickets for event 10
+('Mesa', 10, 50, 2000.00),               -- 50 Mesa tickets for event 10
+
+('General Admission', 11, 200, 1000.00), -- 200 general admission tickets for event 11
+('VIP', 11, 100, 1500.00),               -- 100 VIP tickets for event 11
+('Box', 11, 20, 3000.00),                -- 20 Box tickets for event 11
+
+('General Admission', 4, 100, 1000.00),  -- 100 general admission tickets for event 4
+('VIP', 4, 50, 1500.00),                 -- 50 VIP tickets for event 4
+('Exclusive', 4, 25, 2000.00),           -- 25 Exclusive tickets for event 4
+
+('General Admission', 5, 200, 1000.00),  -- 200 general admission tickets for event 5
+('VIP', 5, 100, 1500.00),                -- 100 VIP tickets for event 5
+('Lounge', 5, 30, 2500.00),              -- 30 Lounge tickets for event 5
+
+('General Admission', 6, 150, 1000.00),  -- 150 general admission tickets for event 6
+('VIP', 6, 75, 1500.00),                 -- 75 VIP tickets for event 6
+('Table', 6, 40, 2000.00),               -- 40 Table tickets for event 6
+
+('General Admission', 7, 250, 1000.00),  -- 250 general admission tickets for event 7
+('VIP', 7, 125, 1500.00),                -- 125 VIP tickets for event 7
+('Front Row', 7, 60, 3000.00),           -- 60 Front Row tickets for event 7
+
+('General Admission', 8, 100, 1000.00),  -- 100 general admission tickets for event 8
+('VIP', 8, 50, 1500.00),                 -- 50 VIP tickets for event 8
+('Balcony', 8, 20, 2000.00),             -- 20 Balcony tickets for event 8
+
+('General Admission', 9, 200, 1000.00),  -- 200 general admission tickets for event 9
+('VIP', 9, 100, 1500.00),                -- 100 VIP tickets for event 9
+('Stage Side', 9, 50, 2500.00);          -- 50 Stage Side tickets for event 9
 
 -- Insert ticket purchases
-INSERT INTO ticketpurchases (userid, eventid, tickettypeid, quantity_purchased, used) VALUES
-(1, 1, 1, 5, TRUE),   -- User1 purchased 5 general admission tickets for event 1, all used
-(2, 1, 2, 2, FALSE),  -- User2 purchased 2 VIP tickets for event 1, none used
-(3, 2, 1, 10, TRUE);  -- User3 purchased 10 general admission tickets for event 2, all used
+INSERT INTO ticketpurchases (userid, eventid, entry, quantity_purchased, used) VALUES
+(1, 12, 'General Admission', 5, TRUE),   -- User1 purchased 5 general admission tickets for event 12, all used
+(2, 12, 'VIP', 2, FALSE),  -- User2 purchased 2 VIP tickets for event 12, none used
+(3, 10, 'General Admission', 10, TRUE);  -- User3 purchased 10 general admission tickets for event 10, all used

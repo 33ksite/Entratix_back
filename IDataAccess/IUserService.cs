@@ -4,7 +4,6 @@ namespace IDataAccess
 {
     public interface IUserService
     {
-        List<string> GetAll();
 
         Task<string> Insert(User user);
 
@@ -13,5 +12,7 @@ namespace IDataAccess
         Task<User> GetUserByToken(string token);
 
         Task<string> UpdateToken(User user);
+
+        Task<List<TicketPurchase>> GetUserTickets(int userId);
     }
 }

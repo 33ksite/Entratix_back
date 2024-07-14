@@ -33,13 +33,15 @@ namespace DataAccess.Contexts
             modelBuilder.Entity<Event>().HasMany(e => e.TicketPurchases).WithOne(tp => tp.Event).HasForeignKey(tp => tp.EventId);
 
             modelBuilder.Entity<EventTicket>().ToTable("eventtickets");
-            modelBuilder.Entity<EventTicket>().HasKey(et => new { et.EventId, et.Entry });
+            modelBuilder.Entity<EventTicket>().Property(et => et.Id).HasColumnName("id");
+            modelBuilder.Entity<EventTicket>().HasKey(et => et.Id);
             modelBuilder.Entity<EventTicket>().HasOne(et => et.Event).WithMany(e => e.EventTickets).HasForeignKey(et => et.EventId);
 
             modelBuilder.Entity<TicketPurchase>().ToTable("ticketpurchases");
-            modelBuilder.Entity<TicketPurchase>().HasKey(tp => new { tp.UserId, tp.EventId, tp.Entry });
+            modelBuilder.Entity<TicketPurchase>().HasKey(tp => new { tp.UserId, tp.EventId, tp.TicketTypeId });
             modelBuilder.Entity<TicketPurchase>().HasOne(tp => tp.User).WithMany(u => u.TicketPurchases).HasForeignKey(tp => tp.UserId);
             modelBuilder.Entity<TicketPurchase>().HasOne(tp => tp.Event).WithMany(e => e.TicketPurchases).HasForeignKey(tp => tp.EventId);
+            modelBuilder.Entity<TicketPurchase>().HasOne(tp => tp.EventTicket).WithMany().HasForeignKey(tp => tp.TicketTypeId);
         }
     }
 }

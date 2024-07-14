@@ -14,13 +14,6 @@ namespace DataAccess
             _dbContexto = dbContexto;
         }
 
-        public List<string> GetAll()
-        {
-
-
-            return new List<string> { "user1", "user2", "user3" };
-        }
-
         public async Task<string> Insert(User user)
         {
             try
@@ -98,5 +91,13 @@ namespace DataAccess
             }
         }
 
+        public async Task<List<TicketPurchase>> GetUserTickets(int userId)
+        {
+            return await _dbContexto.TicketPurchases
+            .Include(tp => tp.Event)
+            .Include(tp => tp.EventTicket)
+            .Where(tp => tp.UserId == userId && tp.EventTicket.EventId == tp.EventId)
+            .ToListAsync();
+        }
     }
 }

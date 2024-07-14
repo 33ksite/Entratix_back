@@ -5,9 +5,6 @@ using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Entratix_Backend.Utilities;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Entratix_Backend.Controllers
 {
@@ -42,11 +39,11 @@ namespace Entratix_Backend.Controllers
                     return Unauthorized("Invalid or missing token");
                 }
 
-                var ticketPurchases = ticketPurchaseDTOs.Select(dto => new TicketPurchase
+                List<TicketPurchase> ticketPurchases = ticketPurchaseDTOs.Select(dto => new TicketPurchase
                 {
                     UserId = userId.Value,
                     EventId = dto.EventId,
-                    Entry = dto.Entry,
+                    TicketTypeId = dto.EventTicketId,
                     QuantityPurchased = dto.QuantityPurchased,
                     Used = false
                 }).ToList();

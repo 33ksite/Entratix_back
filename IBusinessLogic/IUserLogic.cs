@@ -4,6 +4,8 @@ namespace IBusinessLogic
 {
     public interface IUserLogic
     {
-        public List<User> GetUsers();
+
+        Task<List<TicketPurchase>> GetUserTickets(int userId);
+
     }
 }

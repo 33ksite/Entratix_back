@@ -81,7 +81,6 @@ namespace Entratix_Backend.Controllers
                 eventToUpdate.Description = eventModel.Description;
                 eventToUpdate.Date = eventModel.Date;
                 eventToUpdate.Location = eventModel.Location;
-                eventToUpdate.Cost = eventModel.Cost;
                 eventToUpdate.Photo = eventModel.Photo;
                 eventToUpdate.Department = eventModel.Department;
                 eventToUpdate.EventTickets = eventModel.EventTickets.Select(et => new EventTicket

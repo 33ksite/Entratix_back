@@ -95,7 +95,7 @@ namespace DataAccess
         {
             return await _dbContexto.TicketPurchases
                 .Include(tp => tp.Event)
-                .Include(tp => tp.EventTicket) // Incluir la relación EventTicket
+                .Include(tp => tp.EventTicket)
                 .Where(tp => tp.UserId == userId)
                 .ToListAsync();
         }

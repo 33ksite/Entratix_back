@@ -33,6 +33,7 @@ namespace DataAccess.Contexts
             modelBuilder.Entity<Event>().HasMany(e => e.TicketPurchases).WithOne(tp => tp.Event).HasForeignKey(tp => tp.EventId);
 
             modelBuilder.Entity<EventTicket>().ToTable("eventtickets");
+            modelBuilder.Entity<EventTicket>().Property(et => et.Id).HasColumnName("id");
             modelBuilder.Entity<EventTicket>().HasKey(et => et.Id);
             modelBuilder.Entity<EventTicket>().HasOne(et => et.Event).WithMany(e => e.EventTickets).HasForeignKey(et => et.EventId);
 

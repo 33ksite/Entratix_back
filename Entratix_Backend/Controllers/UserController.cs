@@ -3,8 +3,6 @@ using Entratix_Backend.Utilities;
 using IDataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,11 +40,11 @@ namespace Entratix_Backend.Controllers
                 }
 
                 var tickets = await _userService.GetUserTickets(userId.Value);
-
                 var groupedTickets = tickets.GroupBy(tp => tp.Event);
-                var userTickets = groupedTickets.Select(g => new UserTicketsModel(g.Key, g.ToList())).ToList();
 
-                return Ok(userTickets);
+                var ticketDtos = groupedTickets.Select(group => new UserTicketsModel(group.Key, group.ToList())).ToList();
+
+                return Ok(ticketDtos);
             }
             catch (Exception ex)
             {

@@ -9,6 +9,7 @@ using Entratix_Backend;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Entratix_Backend.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 var myOrigins = "_myOrigins";
@@ -68,6 +69,7 @@ builder.Services.AddScoped<IUserLogic, UserLogic>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<ITicketPurchaseService, TicketPurchaseService>();
 builder.Services.AddScoped<ITicketPurchaseLogic, TicketPurchaseLogic>();
+builder.Services.AddSingleton<TokenManager>();
 
 var app = builder.Build();
 

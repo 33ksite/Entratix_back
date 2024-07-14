@@ -2,7 +2,6 @@
 using Domain;
 using IDataAccess;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace DataAccess
 {
@@ -23,7 +22,7 @@ namespace DataAccess
                 var existingPurchase = await _dbContexto.TicketPurchases
                     .FirstOrDefaultAsync(tp => tp.UserId == ticketPurchase.UserId &&
                                                tp.EventId == ticketPurchase.EventId &&
-                                               tp.Entry == ticketPurchase.Entry);
+                                               tp.TicketTypeId == ticketPurchase.TicketTypeId);
 
                 if (existingPurchase != null)
                 {

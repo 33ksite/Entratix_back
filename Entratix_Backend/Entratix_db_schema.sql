@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS eventtickets;
 DROP TABLE IF EXISTS ticketpurchases;
+DROP TABLE IF EXISTS eventtickets;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS roles;
@@ -38,14 +38,23 @@ CREATE TABLE events (
     department VARCHAR(255)
 );
 
+-- Create the table EventTickets with id, entry, and price columns
+CREATE TABLE eventtickets (
+    id SERIAL PRIMARY KEY,
+    eventid INT REFERENCES events(id),
+    entry VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL
+);
+
 -- Create the table TicketPurchases to relate Users with EventTickets
 CREATE TABLE ticketpurchases (
     userid INT REFERENCES users(id),
     eventid INT REFERENCES events(id),
-    entry VARCHAR(255) NOT NULL,
+    ticket_type INT REFERENCES eventtickets(id),
     quantity_purchased INT,
     used BOOLEAN DEFAULT FALSE,
-    PRIMARY KEY (userid, eventid, entry)
+    PRIMARY KEY (userid, eventid, ticket_type)
 );
 
 -- Insert roles
@@ -76,15 +85,6 @@ INSERT INTO events (id, userid, name, description, date, location, cost, photo, 
 (1, 1, 'PHONOTEQUE LIVE PHORO APERTURA 2024 NO TE LO PIERDAS', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', '2020-12-12', 'Piedra Alta 1254', 100.00, 'https://static1.squarespace.com/static/58a39fb503596e0fdbb001a6/58aa378bff7c50f538e999a1/5c599dba6e9a7f0c4232b02e/1549377032782/51398940_2545058242177592_4914365089764605952_o.jpg?format=1500w','Montevideo'),
 (2, 2, 'Key on Tour - Buenos Aires 2024','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', '2020-12-14',  'Palermo 1412', 150.00, 'https://api.entraste.com/sc/uploads/file/a62398317b510a52ef5370cbec261de7','Montevideo'),
 (3, 3, 'Room - DJ Detected b2b DJ Koolt','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', '2024-12-15',  'Paysandu 1351, esq Rondo', 150.00, 'https://static.ra.co/images/news/2019/dj-koolt-ade-ra-live-motd.jpg','Montevideo');
-
--- Create the table EventTickets with id, entry, and price columns
-CREATE TABLE eventtickets (
-    id SERIAL PRIMARY KEY,
-    eventid INT REFERENCES events(id),
-    entry VARCHAR(255) NOT NULL,
-    quantity INT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL
-);
 
 -- Insert associations of ticket types with events
 INSERT INTO eventtickets (entry, eventid, quantity, price) VALUES
@@ -137,7 +137,7 @@ INSERT INTO eventtickets (entry, eventid, quantity, price) VALUES
 ('Stage Side', 9, 50, 2500.00);          -- 50 Stage Side tickets for event 9
 
 -- Insert ticket purchases
-INSERT INTO ticketpurchases (userid, eventid, entry, quantity_purchased, used) VALUES
-(1, 12, 'General Admission', 5, TRUE),   -- User1 purchased 5 general admission tickets for event 12, all used
-(2, 12, 'VIP', 2, FALSE),  -- User2 purchased 2 VIP tickets for event 12, none used
-(3, 10, 'General Admission', 10, TRUE);  -- User3 purchased 10 general admission tickets for event 10, all used
+INSERT INTO ticketpurchases (userid, eventid, ticket_type, quantity_purchased, used) VALUES
+(1, 12, 1, 5, TRUE),   -- User1 purchased 5 general admission tickets for event 12, all used
+(2, 12, 2, 2, FALSE),  -- User2 purchased 2 VIP tickets for event 12, none used
+(3, 10, 4, 10, TRUE);  -- User3 purchased 10 general admission tickets for event 10, all used

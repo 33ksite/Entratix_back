@@ -94,9 +94,10 @@ namespace DataAccess
         public async Task<List<TicketPurchase>> GetUserTickets(int userId)
         {
             return await _dbContexto.TicketPurchases
-                                    .Include(tp => tp.Event)
-                                    .Where(tp => tp.UserId == userId)
-                                    .ToListAsync();
+                .Include(tp => tp.Event)
+                .Include(tp => tp.EventTicket) // Incluir la relación EventTicket
+                .Where(tp => tp.UserId == userId)
+                .ToListAsync();
         }
     }
 }

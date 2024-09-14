@@ -21,6 +21,10 @@ namespace Domain
         [Column("quantity_purchased")]
         public int QuantityPurchased { get; set; }
 
+        [Required]
+        [Column("ticket_code")]
+        public string TicketCode { get; set; }
+
         [Column("used")]
         public bool Used { get; set; }
 

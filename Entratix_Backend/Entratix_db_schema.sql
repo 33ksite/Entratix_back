@@ -52,8 +52,9 @@ CREATE TABLE ticketpurchases (
     eventid INT REFERENCES events(id),
     ticket_type INT REFERENCES eventtickets(id),
     quantity_purchased INT,
+    ticket_code VARCHAR(255) UNIQUE NOT NULL,
     used BOOLEAN DEFAULT FALSE,
-    PRIMARY KEY (userid, eventid, ticket_type)
+    PRIMARY KEY (userid, eventid, ticket_type, ticket_code)
 );
 
 -- Insert roles
@@ -136,7 +137,7 @@ INSERT INTO eventtickets (entry, eventid, quantity, price) VALUES
 ('Stage Side', 9, 50, 2500.00);          -- 50 Stage Side tickets for event 9
 
 -- Insert ticket purchases
-INSERT INTO ticketpurchases (userid, eventid, ticket_type, quantity_purchased, used) VALUES
-(1, 12, 1, 5, TRUE),   -- User1 purchased 5 general admission tickets for event 12, all used
-(2, 12, 2, 2, FALSE),  -- User2 purchased 2 VIP tickets for event 12, none used
-(3, 10, 4, 10, TRUE);  -- User3 purchased 10 general admission tickets for event 10, all used
+INSERT INTO ticketpurchases (userid, eventid, ticket_type, quantity_purchased,ticket_code, used) VALUES
+(1, 12, 1, 5,'abc', TRUE),   -- User1 purchased 5 general admission tickets for event 12, all used
+(2, 12, 2, 2,'cdt', FALSE),  -- User2 purchased 2 VIP tickets for event 12, none used
+(3, 10, 4, 10,'123a', TRUE);  -- User3 purchased 10 general admission tickets for event 10, all used

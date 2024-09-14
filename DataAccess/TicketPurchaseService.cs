@@ -28,31 +28,29 @@ namespace DataAccess
                     return "User, Event, or EventTicket not found";
                 }
 
-                // Validate that the EventTicket belongs to the Event
                 if (eventTicket.EventId != eventEntity.Id)
                 {
                     return "The EventTicket does not belong to the specified Event";
                 }
 
-                // Verify if there is an existing purchase with the same UserId, EventId, and TicketTypeId
-                var existingPurchase = await _dbContexto.TicketPurchases
-                    .FirstOrDefaultAsync(tp => tp.UserId == ticketPurchase.UserId &&
-                                               tp.EventId == ticketPurchase.EventId &&
-                                               tp.TicketTypeId == ticketPurchase.TicketTypeId);
+                ticketPurchase.User = user;
+                ticketPurchase.Event = eventEntity;
+                ticketPurchase.EventTicket = eventTicket;
 
-                if (existingPurchase != null)
+                var newTicketPurchase = new TicketPurchase
                 {
-                    existingPurchase.QuantityPurchased += ticketPurchase.QuantityPurchased;
-                    _dbContexto.TicketPurchases.Update(existingPurchase);
-                }
-                else
-                {
-                    ticketPurchase.User = user;
-                    ticketPurchase.Event = eventEntity;
-                    ticketPurchase.EventTicket = eventTicket;
+                    UserId = ticketPurchase.UserId,
+                    EventId = ticketPurchase.EventId,
+                    TicketTypeId = ticketPurchase.TicketTypeId,
+                    QuantityPurchased = 1,
+                    TicketCode = ticketPurchase.TicketCode,           
+                    Used = ticketPurchase.Used,
+                    User = user,
+                    Event = eventEntity,
+                    EventTicket = eventTicket
+                };
 
-                    _dbContexto.TicketPurchases.Add(ticketPurchase);
-                }
+                _dbContexto.TicketPurchases.Add(newTicketPurchase);
 
                 await _dbContexto.SaveChangesAsync();
                 return "Ticket purchased successfully";
@@ -62,6 +60,5 @@ namespace DataAccess
                 return $"Error purchasing ticket: {ex.Message}";
             }
         }
-
     }
 }

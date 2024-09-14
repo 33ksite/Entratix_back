@@ -1,7 +1,6 @@
 // Add services to the container.
 using DataAccess;
 using IDataAccess;
-using DataAccess.Contexts;
 using IBusinessLogic;
 using BusinessLogic;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +9,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Entratix_Backend.Utilities;
+using IServices;
+using Services;
+using DataAccess.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 var myOrigins = "_myOrigins";
@@ -69,7 +71,10 @@ builder.Services.AddScoped<IUserLogic, UserLogic>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<ITicketPurchaseService, TicketPurchaseService>();
 builder.Services.AddScoped<ITicketPurchaseLogic, TicketPurchaseLogic>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<TokenManager>();
+builder.Services.AddHttpClient<IEmailService, EmailService>();
+
 
 var app = builder.Build();
 

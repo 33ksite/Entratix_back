@@ -31,10 +31,6 @@ namespace Entratix_Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Cost")
-                        .HasColumnType("numeric")
-                        .HasColumnName("cost");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date");
@@ -77,13 +73,21 @@ namespace Entratix_Backend.Migrations
 
             modelBuilder.Entity("Domain.EventTicket", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Entry")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("entry");
+
                     b.Property<int>("EventId")
                         .HasColumnType("integer")
                         .HasColumnName("eventid");
-
-                    b.Property<string>("Entry")
-                        .HasColumnType("text")
-                        .HasColumnName("entry");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric")
@@ -93,7 +97,9 @@ namespace Entratix_Backend.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
 
-                    b.HasKey("EventId", "Entry");
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
 
                     b.ToTable("eventtickets", (string)null);
                 });
@@ -127,9 +133,13 @@ namespace Entratix_Backend.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("eventid");
 
-                    b.Property<string>("Entry")
+                    b.Property<int>("TicketTypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ticket_type");
+
+                    b.Property<string>("TicketCode")
                         .HasColumnType("text")
-                        .HasColumnName("entry");
+                        .HasColumnName("ticket_code");
 
                     b.Property<int>("QuantityPurchased")
                         .HasColumnType("integer")
@@ -139,9 +149,11 @@ namespace Entratix_Backend.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("used");
 
-                    b.HasKey("UserId", "EventId", "Entry");
+                    b.HasKey("UserId", "EventId", "TicketTypeId", "TicketCode");
 
                     b.HasIndex("EventId");
+
+                    b.HasIndex("TicketTypeId");
 
                     b.ToTable("ticketpurchases", (string)null);
                 });
@@ -239,6 +251,12 @@ namespace Entratix_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Domain.EventTicket", "EventTicket")
+                        .WithMany()
+                        .HasForeignKey("TicketTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.User", "User")
                         .WithMany("TicketPurchases")
                         .HasForeignKey("UserId")
@@ -246,6 +264,8 @@ namespace Entratix_Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
+
+                    b.Navigation("EventTicket");
 
                     b.Navigation("User");
                 });

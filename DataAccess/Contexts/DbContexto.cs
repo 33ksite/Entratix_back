@@ -38,7 +38,7 @@ namespace DataAccess.Contexts
             modelBuilder.Entity<EventTicket>().HasOne(et => et.Event).WithMany(e => e.EventTickets).HasForeignKey(et => et.EventId);
 
             modelBuilder.Entity<TicketPurchase>().ToTable("ticketpurchases");
-            modelBuilder.Entity<TicketPurchase>().HasKey(tp => new { tp.UserId, tp.EventId, tp.TicketTypeId });
+            modelBuilder.Entity<TicketPurchase>().HasKey(tp => new { tp.UserId, tp.EventId, tp.TicketTypeId, tp.TicketCode });
             modelBuilder.Entity<TicketPurchase>().HasOne(tp => tp.User).WithMany(u => u.TicketPurchases).HasForeignKey(tp => tp.UserId);
             modelBuilder.Entity<TicketPurchase>().HasOne(tp => tp.Event).WithMany(e => e.TicketPurchases).HasForeignKey(tp => tp.EventId);
             modelBuilder.Entity<TicketPurchase>().HasOne(tp => tp.EventTicket).WithMany().HasForeignKey(tp => tp.TicketTypeId);

@@ -44,7 +44,7 @@ namespace DataAccess
                     TicketTypeId = ticketPurchase.TicketTypeId,
                     QuantityPurchased = 1,
                     TicketCode = ticketPurchase.TicketCode,           
-                    Used = ticketPurchase.Used,
+                    Used = false,
                     User = user,
                     Event = eventEntity,
                     EventTicket = eventTicket

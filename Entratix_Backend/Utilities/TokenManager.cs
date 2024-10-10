@@ -72,10 +72,8 @@ namespace Entratix_Backend.Utilities
         {
             try
             {
-
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var jwtToken = tokenHandler.ReadJwtToken(token);
-
                 var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid);
                 return userIdClaim != null ? int.Parse(userIdClaim.Value) : (int?)null;
             }
@@ -85,6 +83,8 @@ namespace Entratix_Backend.Utilities
                 return null;
             }
         }
+
+
     }
 
 }

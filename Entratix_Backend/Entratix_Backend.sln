@@ -5,15 +5,19 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entratix_Backend", "Entratix_Backend.csproj", "{E58716F5-7E2C-439F-9F01-497B4FA1A109}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "..\BusinessLogic\BusinessLogic.csproj", "{95C89903-F816-4B09-ADA7-C490B83D6C18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogic", "..\BusinessLogic\BusinessLogic.csproj", "{95C89903-F816-4B09-ADA7-C490B83D6C18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IBusinessLogic", "..\IBusinessLogic\IBusinessLogic.csproj", "{C6D36B6A-2F58-4C02-A54E-8DF48CA9744D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IBusinessLogic", "..\IBusinessLogic\IBusinessLogic.csproj", "{C6D36B6A-2F58-4C02-A54E-8DF48CA9744D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "..\DataAccess\DataAccess.csproj", "{D5D5F245-34D8-4EEC-A19C-674DC019AE09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "..\DataAccess\DataAccess.csproj", "{D5D5F245-34D8-4EEC-A19C-674DC019AE09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDataAccess", "..\IDataAccess\IDataAccess.csproj", "{88720439-BEEF-41EC-8269-9AB9BC9D092D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDataAccess", "..\IDataAccess\IDataAccess.csproj", "{88720439-BEEF-41EC-8269-9AB9BC9D092D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "..\Domain\Domain.csproj", "{FE97233F-5C26-49BC-B655-246B606A932D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "..\Domain\Domain.csproj", "{FE97233F-5C26-49BC-B655-246B606A932D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "..\Services\Services.csproj", "{0CA309D9-8F7F-4AEE-9B2F-8B567A03C310}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IServices", "..\IServices\IServices.csproj", "{B3DCCF22-469F-48D9-AC25-829C0A2112BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,14 @@ Global
 		{FE97233F-5C26-49BC-B655-246B606A932D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE97233F-5C26-49BC-B655-246B606A932D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE97233F-5C26-49BC-B655-246B606A932D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CA309D9-8F7F-4AEE-9B2F-8B567A03C310}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CA309D9-8F7F-4AEE-9B2F-8B567A03C310}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CA309D9-8F7F-4AEE-9B2F-8B567A03C310}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CA309D9-8F7F-4AEE-9B2F-8B567A03C310}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3DCCF22-469F-48D9-AC25-829C0A2112BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3DCCF22-469F-48D9-AC25-829C0A2112BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3DCCF22-469F-48D9-AC25-829C0A2112BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3DCCF22-469F-48D9-AC25-829C0A2112BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

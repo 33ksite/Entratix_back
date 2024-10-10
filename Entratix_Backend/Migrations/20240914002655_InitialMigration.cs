@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Entratix_Backend.Migrations
 {
-    public partial class First : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -56,7 +56,6 @@ namespace Entratix_Backend.Migrations
                     description = table.Column<string>(type: "text", nullable: false),
                     date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     location = table.Column<string>(type: "text", nullable: false),
-                    cost = table.Column<decimal>(type: "numeric", nullable: false),
                     photo = table.Column<string>(type: "text", nullable: false),
                     department = table.Column<string>(type: "text", nullable: false)
                 },
@@ -75,6 +74,8 @@ namespace Entratix_Backend.Migrations
                 name: "eventtickets",
                 columns: table => new
                 {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     eventid = table.Column<int>(type: "integer", nullable: false),
                     entry = table.Column<string>(type: "text", nullable: false),
                     quantity = table.Column<int>(type: "integer", nullable: false),
@@ -82,7 +83,7 @@ namespace Entratix_Backend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_eventtickets", x => new { x.eventid, x.entry });
+                    table.PrimaryKey("PK_eventtickets", x => x.id);
                     table.ForeignKey(
                         name: "FK_eventtickets_events_eventid",
                         column: x => x.eventid,
@@ -97,17 +98,24 @@ namespace Entratix_Backend.Migrations
                 {
                     userid = table.Column<int>(type: "integer", nullable: false),
                     eventid = table.Column<int>(type: "integer", nullable: false),
-                    entry = table.Column<string>(type: "text", nullable: false),
+                    ticket_type = table.Column<int>(type: "integer", nullable: false),
+                    ticket_code = table.Column<string>(type: "text", nullable: false),
                     quantity_purchased = table.Column<int>(type: "integer", nullable: false),
                     used = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ticketpurchases", x => new { x.userid, x.eventid, x.entry });
+                    table.PrimaryKey("PK_ticketpurchases", x => new { x.userid, x.eventid, x.ticket_type, x.ticket_code });
                     table.ForeignKey(
                         name: "FK_ticketpurchases_events_eventid",
                         column: x => x.eventid,
                         principalTable: "events",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ticketpurchases_eventtickets_ticket_type",
+                        column: x => x.ticket_type,
+                        principalTable: "eventtickets",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -124,9 +132,19 @@ namespace Entratix_Backend.Migrations
                 column: "userid");
 
             migrationBuilder.CreateIndex(
+                name: "IX_eventtickets_eventid",
+                table: "eventtickets",
+                column: "eventid");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ticketpurchases_eventid",
                 table: "ticketpurchases",
                 column: "eventid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ticketpurchases_ticket_type",
+                table: "ticketpurchases",
+                column: "ticket_type");
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_email",
@@ -138,13 +156,13 @@ namespace Entratix_Backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "eventtickets");
-
-            migrationBuilder.DropTable(
                 name: "roles");
 
             migrationBuilder.DropTable(
                 name: "ticketpurchases");
+
+            migrationBuilder.DropTable(
+                name: "eventtickets");
 
             migrationBuilder.DropTable(
                 name: "events");

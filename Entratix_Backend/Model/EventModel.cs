@@ -26,7 +26,6 @@ namespace Entratix_Backend.Model
             Description = ev.Description;
             Date = ev.Date;
             Location = ev.Location;
-            Cost = ev.Cost;
             Photo = ev.Photo;
             Department = ev.Department;
             EventTickets = ev.EventTickets.Select(et => new EventTicketModel(et)).ToList();
@@ -43,7 +42,6 @@ namespace Entratix_Backend.Model
                 Description = eventModel.Description,
                 Date = eventModel.Date,
                 Location = eventModel.Location,
-                Cost = eventModel.Cost,
                 Photo = eventModel.Photo,
                 Department = eventModel.Department,
                 EventTickets = eventModel.EventTickets.Select(et => new EventTicket

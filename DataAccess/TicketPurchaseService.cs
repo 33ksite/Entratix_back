@@ -2,7 +2,6 @@
 using Domain;
 using IDataAccess;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace DataAccess
 {
@@ -19,30 +18,39 @@ namespace DataAccess
         {
             try
             {
-                // Verify if there is an existing purchase with the same UserId, EventId, and Entry
-                var existingPurchase = await _dbContexto.TicketPurchases
-                    .FirstOrDefaultAsync(tp => tp.UserId == ticketPurchase.UserId &&
-                                               tp.EventId == ticketPurchase.EventId &&
-                                               tp.Entry == ticketPurchase.Entry);
+                // Load related entities
+                var user = await _dbContexto.Users.FindAsync(ticketPurchase.UserId);
+                var eventEntity = await _dbContexto.Events.FindAsync(ticketPurchase.EventId);
+                var eventTicket = await _dbContexto.EventTickets.FindAsync(ticketPurchase.TicketTypeId);
 
-                if (existingPurchase != null)
+                if (user == null || eventEntity == null || eventTicket == null)
                 {
-                    existingPurchase.QuantityPurchased += ticketPurchase.QuantityPurchased;
-                    _dbContexto.TicketPurchases.Update(existingPurchase);
+                    return "User, Event, or EventTicket not found";
                 }
-                else
+
+                if (eventTicket.EventId != eventEntity.Id)
                 {
-                    // Load related entities
-                    ticketPurchase.User = await _dbContexto.Users.FindAsync(ticketPurchase.UserId);
-                    ticketPurchase.Event = await _dbContexto.Events.FindAsync(ticketPurchase.EventId);
-
-                    if (ticketPurchase.User == null || ticketPurchase.Event == null)
-                    {
-                        return "User or Event not found";
-                    }
-
-                    _dbContexto.TicketPurchases.Add(ticketPurchase);
+                    return "The EventTicket does not belong to the specified Event";
                 }
+
+                ticketPurchase.User = user;
+                ticketPurchase.Event = eventEntity;
+                ticketPurchase.EventTicket = eventTicket;
+
+                var newTicketPurchase = new TicketPurchase
+                {
+                    UserId = ticketPurchase.UserId,
+                    EventId = ticketPurchase.EventId,
+                    TicketTypeId = ticketPurchase.TicketTypeId,
+                    QuantityPurchased = 1,
+                    TicketCode = ticketPurchase.TicketCode,           
+                    Used = false,
+                    User = user,
+                    Event = eventEntity,
+                    EventTicket = eventTicket
+                };
+
+                _dbContexto.TicketPurchases.Add(newTicketPurchase);
 
                 await _dbContexto.SaveChangesAsync();
                 return "Ticket purchased successfully";

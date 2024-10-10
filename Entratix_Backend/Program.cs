@@ -71,10 +71,10 @@ builder.Services.AddScoped<IUserLogic, UserLogic>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<ITicketPurchaseService, TicketPurchaseService>();
 builder.Services.AddScoped<ITicketPurchaseLogic, TicketPurchaseLogic>();
-builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddSingleton<TokenManager>();
-builder.Services.AddHttpClient<IEmailService, EmailService>();
+
 
 
 var app = builder.Build();

@@ -2,8 +2,8 @@
 {
     public interface IQueueService
     {
-        Task SendMessageAsync<T>(T message);
+        Task SendMessageAsync<T>(T message, string routingKey, string queueName);
 
-        Task ReceiveMessagesAsync();
+        Task ReceiveMessagesAsync(string routingKey, string queueName);
     }
 }

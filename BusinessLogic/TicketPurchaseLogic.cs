@@ -62,7 +62,8 @@ namespace BusinessLogic
                 try
                 {
                     // Publicar todos los detalles del ticket en un solo mensaje en la cola
-                    await _queueService.SendMessageAsync(emailDetailsList);
+                    await _queueService.SendMessageAsync(emailDetailsList, "ticket.purchased", "email_queue");
+
                     Console.WriteLine("Tickets enviados correctamente a la cola.");
                 }
                 catch (Exception ex)

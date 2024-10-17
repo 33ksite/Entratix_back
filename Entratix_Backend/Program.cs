@@ -72,9 +72,10 @@ builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<ITicketPurchaseService, TicketPurchaseService>();
 builder.Services.AddScoped<ITicketPurchaseLogic, TicketPurchaseLogic>();
 
-builder.Services.AddScoped<IQueueService, QueueService>();
-builder.Services.AddSingleton<TokenManager>();
+builder.Services.AddScoped<IMessageProducer, RabbitMqProducer>();
 
+builder.Services.AddSingleton<TokenManager>();
+builder.Services.AddSingleton<IRabbitMqConnection>(new RabbitMqConnection());
 
 
 var app = builder.Build();

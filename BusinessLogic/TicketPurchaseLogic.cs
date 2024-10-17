@@ -12,12 +12,12 @@ namespace BusinessLogic
     public class TicketPurchaseLogic : ITicketPurchaseLogic
     {
         private readonly ITicketPurchaseService _ticketPurchaseService;
-        private readonly IQueueService _queueService;
+        private readonly IMessageProducer _messageProducer;
 
-        public TicketPurchaseLogic(ITicketPurchaseService ticketPurchaseService, IQueueService queueService)
+        public TicketPurchaseLogic(ITicketPurchaseService ticketPurchaseService, IMessageProducer messageProducer)
         {
             _ticketPurchaseService = ticketPurchaseService;
-            _queueService = queueService;
+            _messageProducer = messageProducer;
         }
 
         public async Task<bool> PurchaseTickets(List<TicketPurchase> ticketPurchases)
@@ -62,7 +62,7 @@ namespace BusinessLogic
                 try
                 {
                     // Publicar todos los detalles del ticket en un solo mensaje en la cola
-                    await _queueService.SendMessageAsync(emailDetailsList, "ticket.purchased", "email_queue");
+                    await _messageProducer.SendMessageAsync(emailDetailsList, "ticket.purchased", "email_queue");
 
                     Console.WriteLine("Tickets enviados correctamente a la cola.");
                 }

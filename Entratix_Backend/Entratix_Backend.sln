@@ -15,9 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDataAccess", "..\IDataAcce
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "..\Domain\Domain.csproj", "{FE97233F-5C26-49BC-B655-246B606A932D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "..\Services\Services.csproj", "{0CA309D9-8F7F-4AEE-9B2F-8B567A03C310}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "..\Services\Services.csproj", "{0CA309D9-8F7F-4AEE-9B2F-8B567A03C310}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IServices", "..\IServices\IServices.csproj", "{B3DCCF22-469F-48D9-AC25-829C0A2112BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IServices", "..\IServices\IServices.csproj", "{B3DCCF22-469F-48D9-AC25-829C0A2112BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscriber", "..\ConsoleApp1\Subscriber.csproj", "{FA546CDC-9296-4EE0-92B0-872D872F1B33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{B3DCCF22-469F-48D9-AC25-829C0A2112BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3DCCF22-469F-48D9-AC25-829C0A2112BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3DCCF22-469F-48D9-AC25-829C0A2112BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA546CDC-9296-4EE0-92B0-872D872F1B33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA546CDC-9296-4EE0-92B0-872D872F1B33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA546CDC-9296-4EE0-92B0-872D872F1B33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA546CDC-9296-4EE0-92B0-872D872F1B33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

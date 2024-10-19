@@ -2,10 +2,6 @@
 using IBusinessLogic;
 using IDataAccess;
 using IServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;  // Necesario para el método Sum
-using System.Threading.Tasks;
 
 namespace BusinessLogic
 {
@@ -39,16 +35,16 @@ namespace BusinessLogic
                     var emailDetails = new
                     {
                         Email = ticketPurchase.User.Email,
-                        UserName = ticketPurchase.User.FirstName +" "+ ticketPurchase.User.LastName,
+                        UserName = ticketPurchase.User.FirstName + " " + ticketPurchase.User.LastName,
                         TicketCode = ticketPurchase.TicketCode,
                         EventLocation = ticketPurchase.Event?.Location ?? "Ubicación no disponible",
-                        EventName = ticketPurchase.Event?.Name ?? "Evento no disponible", 
+                        EventName = ticketPurchase.Event?.Name ?? "Evento no disponible",
                         EventCode = ticketPurchase.EventTicket?.EventId ?? 0,
                         EventDate = ticketPurchase.EventTicket?.Event?.Date ?? null,
                         EventImage = ticketPurchase.EventTicket?.Event?.Photo ?? null,
                         TicketType = ticketPurchase.Event?.EventTickets
-        .FirstOrDefault(et => et.Id == ticketPurchase.TicketTypeId)?.Entry ?? "Tipo de ticket no disponible",
-                        TotalPurchased = ticketPurchases.Sum(tp => tp.QuantityPurchased), 
+                            .FirstOrDefault(et => et.Id == ticketPurchase.TicketTypeId)?.Entry ?? "Tipo de ticket no disponible",
+                        TotalPurchased = ticketPurchases.Sum(tp => tp.QuantityPurchased),
                         PurchaseResult = result
                     };
 
@@ -56,21 +52,8 @@ namespace BusinessLogic
                 }
             }
 
-            // Enviar los detalles acumulados a la cola en segundo plano
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    // Publicar todos los detalles del ticket en un solo mensaje en la cola
-                    await _messageProducer.SendMessageAsync(emailDetailsList, "ticket.purchased", "email_queue");
-
-                    Console.WriteLine("Tickets enviados correctamente a la cola.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error al enviar los tickets a la cola: {ex.Message}");
-                }
-            });
+            // Enviar los detalles acumulados a la cola en segundo plano sin esperar el resultado
+            _ = _messageProducer.SendMessageAsync(emailDetailsList, "payment.success", "payments_queue");
 
             return true;
         }

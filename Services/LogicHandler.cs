@@ -10,12 +10,10 @@ namespace Services
             if (queueName == "orders" && routingKey == "order.created")
             {
                 Console.WriteLine($"Processing 'order.created' for queue {queueName}: {message}");
-                // Agregar lógica específica para "order.created"
             }
             else if (queueName == "payments" && routingKey == "payment.success")
             {
                 Console.WriteLine($"Processing 'payment.success' for queue {queueName}: {message}");
-                // Agregar lógica específica para "payment.success"
             }
             else
             {

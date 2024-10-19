@@ -2,7 +2,6 @@
 
 namespace Subscriber
 {
-
     public class QueueListener
     {
         private readonly IRabbitMqConsumerService _rabbitMqConsumerService;
@@ -14,8 +13,8 @@ namespace Subscriber
 
         public void Start()
         {
-            // Configurar diferentes colas y claves de enrutamiento
-            _rabbitMqConsumerService.StartListening("redis", "redis.update");
+            // Solo escuchamos en la cola declarada previamente
+            _rabbitMqConsumerService.StartListening("redis_queue", "redis.update");
         }
     }
 }

@@ -2,7 +2,6 @@
 using Services;
 using Subscriber;
 
-
 IRabbitMqConnection rabbitMqConnection = new RabbitMqConnection();
 ILogicHandler logicHandler = new LogicHandler();
 IRabbitMqConsumerService rabbitMqConsumerService = new RabbitMqConsumerService(rabbitMqConnection, logicHandler);

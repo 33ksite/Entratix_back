@@ -21,11 +21,12 @@ ConfigurationManager configuration = builder.Configuration;
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: myOrigins,
-            policy =>
-            {
-                policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials().SetIsOriginAllowed(hostName => true);
-            });
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials().SetIsOriginAllowed(hostName => true);
+        });
 });
+
 // Load appsettings.json configuration
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
@@ -75,12 +76,17 @@ builder.Services.AddScoped<ITicketPurchaseLogic, TicketPurchaseLogic>();
 builder.Services.AddScoped<IMessageProducer, RabbitMqProducer>();
 
 builder.Services.AddSingleton<TokenManager>();
-builder.Services.AddSingleton<IRabbitMqConnection>(new RabbitMqConnection());
 
+// Registrar la conexión RabbitMQ
+var rabbitMqConnection = new RabbitMqConnection();
+builder.Services.AddSingleton<IRabbitMqConnection>(rabbitMqConnection);
+
+// Llamar a RabbitMqSetup para inicializar las colas y exchanges
+var rabbitMqSetup = new RabbitMqSetup(rabbitMqConnection);
+rabbitMqSetup.Initialize();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -90,9 +96,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(myOrigins);
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();

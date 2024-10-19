@@ -13,8 +13,7 @@ namespace Subscriber
 
         public void Start()
         {
-            // Solo escuchamos en la cola declarada previamente
-            _rabbitMqConsumerService.StartListening("redis_queue", "redis.update");
+            _rabbitMqConsumerService.StartListening("payments_queue", "email.sent.success");
         }
     }
 }

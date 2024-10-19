@@ -4,21 +4,37 @@ namespace Services
 {
     public class LogicHandler : ILogicHandler
     {
+        
+        private readonly Dictionary<(string queueName, string routingKey), Action<string>> _handlers;
+
+        public LogicHandler()
+        {
+            // Inicializar el diccionario con las acciones correspondientes
+            _handlers = new Dictionary<(string queueName, string routingKey), Action<string>>
+            {
+                { ("payments_queue", "email.sent.success"), EmailSent },
+                
+            };
+        }
+
+        // Método que se llama para manejar el mensaje
         public void HandleMessage(string queueName, string routingKey, string message)
         {
-            // Aquí puedes decidir qué hacer en función del nombre de la cola y la clave de enrutamiento
-            if (queueName == "orders" && routingKey == "order.created")
+            if (_handlers.TryGetValue((queueName, routingKey), out var handler))
             {
-                Console.WriteLine($"Processing 'order.created' for queue {queueName}: {message}");
-            }
-            else if (queueName == "payments" && routingKey == "payment.success")
-            {
-                Console.WriteLine($"Processing 'payment.success' for queue {queueName}: {message}");
+                handler(message); 
             }
             else
             {
-                Console.WriteLine($"Received message from {queueName} with key {routingKey}: {message}");
+                Console.WriteLine($"No handler found for queue '{queueName}' and routing key '{routingKey}'. Message: {message}");
             }
         }
+
+        
+        private void EmailSent(string message)
+        {
+            Console.WriteLine($"Processing 'email.sent.success': {message}");
+        }
+
     }
 }
